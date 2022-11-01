@@ -47,6 +47,86 @@ void affiche_t_main(Game g);
 /*  Fonctions */
 /* * * * * * * */
 
+// Graphique
+
+void stop_affichage(void* data){
+	int* arret = (int*) data;
+	*arret = 1;
+}
+
+void affiche_lignes(Game g, int window_width, int window_height) {
+    //MLV_clear_window(MLV_COLOR_BLACK);
+
+    // les lignes horizontales
+    for (int y = 1; y < g.height + 1; y++) {
+        MLV_draw_line(0, y * SQUARE_SIZE, window_width, y * SQUARE_SIZE, MLV_COLOR_BLACK);
+    }
+
+    // les lignes verticales
+    for (int x = 1; x < g.width + 1; x++) {
+        MLV_draw_line(x * SQUARE_SIZE, 0, x * SQUARE_SIZE, window_height, MLV_COLOR_BLACK);
+    }
+}
+
+int convert_screen_coords_to_grid_coords(Game g, int window_width, int window_height, int x_souris, int y_souris, int* x, int* y) {
+    if ((0 <= x_souris && x_souris < window_width) || (0 <= y_souris && y_souris < window_height)) {
+        // A améliorer
+        for (int i = 0; i < g.width; i++) {
+            if ((i * SQUARE_SIZE) <= x_souris && x_souris <= ((i + 1) * SQUARE_SIZE)) {
+                *x = i;
+                break;
+            }
+        }
+        for (int j = 0; j < g.height; j++) {
+            if ((j * SQUARE_SIZE) <= y_souris && y_souris <= ((j + 1) * SQUARE_SIZE)) {
+                *y = j;
+                break;
+            }
+        }
+        return 0;
+    }
+    return 1;
+}
+
+void play(Game g, int window_width, int window_height) {
+    // On regarde si l'utilisateur a cliqué :
+    int x_souris, y_souris;
+    int x, y;
+    MLV_get_mouse_position(&x_souris, &y_souris);
+    if(!convert_screen_coords_to_grid_coords(g, window_width, window_height, x_souris, y_souris, &x, &y)) { // si l'utilisateur a cliqué dans la fenêtre
+        if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
+            MLV_draw_filled_rectangle(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, MLV_COLOR_WHITE);
+        } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
+            /*Nothing*/
+        }
+    }    
+}
+
+void affiche_t_main(Game g) {
+    int arret = 0; 
+    // On enregistre la fonction de call back
+    MLV_execute_at_exit(stop_affichage, &arret);
+
+    // Création de la fenêtre
+    int window_width = (g.width) * SQUARE_SIZE;
+    int window_height = (g.height) * SQUARE_SIZE;
+    MLV_create_window("Minesweeper", "minesweeper", window_width, window_height);
+    MLV_draw_filled_rectangle(0, 0, window_width, window_height, MLV_COLOR_GRAY);
+    
+    // Tant que l'utilisateur ne ferme pas la fenêtre
+    do {
+        play(g, window_width, window_height);
+        affiche_lignes(g, window_width, window_height);
+        MLV_update_window();   
+    } while (!arret);
+
+    // on ferme la fenêtre
+    MLV_free_window();
+}
+
+
+// Initialisation
+
 void init_t(Game* g) {
     g -> width = 10;
     g -> height = 6;
@@ -66,45 +146,6 @@ void init_t(Game* g) {
     vect[4] = l5;
     vect[5] = l6;
     g -> terrain = vect;
-}
-
-void stop_affichage(void* data){
-	int* arret = (int*) data;
-	*arret = 1;
-}
-
-void affiche_lignes(Game g, int window_width, int window_height) {
-    MLV_clear_window(MLV_COLOR_BLACK);
-
-    // les lignes horizontales
-    for (int y = 1; y < g.height + 1; y++) {
-        MLV_draw_line(0, y * SQUARE_SIZE, window_width, y * SQUARE_SIZE, MLV_COLOR_WHITE);
-    }
-
-    // les lignes verticales
-    for (int x = 1; x < g.width + 1; x++) {
-        MLV_draw_line(x * SQUARE_SIZE, 0, x * SQUARE_SIZE, window_height, MLV_COLOR_WHITE);
-    }
-    MLV_update_window();
-}
-
-void affiche_t_main(Game g) {
-    int arret = 0; 
-    // On enregistre la fonction de call back
-    MLV_execute_at_exit(stop_affichage, &arret);
-
-    // Création de la fenêtre
-    int window_width = (g.width) * SQUARE_SIZE;
-    int window_height = (g.height) * SQUARE_SIZE;
-    MLV_create_window("Minesweeper", "minesweeper", window_width, window_height);
-
-    // Tant que l'utilisateur ne ferme pas la fenêtre
-    do {
-        affiche_lignes(g, window_width, window_height);
-    } while (!arret);
-
-    // on ferme la fenêtre
-    MLV_free_window();
 }
 
 /* * * * * * * */
