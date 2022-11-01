@@ -58,12 +58,12 @@ void affiche_lignes(Game g, int window_width, int window_height) {
     //MLV_clear_window(MLV_COLOR_BLACK);
 
     // les lignes horizontales
-    for (int y = 1; y < g.height + 1; y++) {
+    for (int y = 0; y < g.height + 2; y++) {
         MLV_draw_line(0, y * SQUARE_SIZE, window_width, y * SQUARE_SIZE, MLV_COLOR_BLACK);
     }
 
     // les lignes verticales
-    for (int x = 1; x < g.width + 1; x++) {
+    for (int x = 0; x < g.width + 2; x++) {
         MLV_draw_line(x * SQUARE_SIZE, 0, x * SQUARE_SIZE, window_height, MLV_COLOR_BLACK);
     }
 }
