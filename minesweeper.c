@@ -25,5 +25,6 @@ typedef struct _game {
 /* * * * * * * */
 
 int main(int argc, char *argv[]) {
+    int a = 2;
     return 0;
 }
