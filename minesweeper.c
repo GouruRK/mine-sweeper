@@ -43,6 +43,17 @@ void affiche_lignes(Game g, int window_width, int window_height);
 */
 void affiche_t_main(Game g);
 
+/**
+ * Permet de convertir les coordonnées de la souris dans les coordonnées du tableau
+ * Modifie les variables x et y en les coordonnées
+ * Retourne 0 si la souris est dans la fenêtre, 1 sinon
+*/
+int convert_screen_coords_to_grid_coords(Game g, int window_width, int window_height, int x_souris, int y_souris, int* x, int* y);
+
+/**
+ * Gère les interractions avec l'utilisateur et le programme
+*/
+int play(Game g, int window_width, int window_height);
 /* * * * * * * */
 /*  Fonctions */
 /* * * * * * * */
@@ -55,8 +66,6 @@ void stop_affichage(void* data){
 }
 
 void affiche_lignes(Game g, int window_width, int window_height) {
-    //MLV_clear_window(MLV_COLOR_BLACK);
-
     // les lignes horizontales
     for (int y = 0; y < g.height + 2; y++) {
         MLV_draw_line(0, y * SQUARE_SIZE, window_width, y * SQUARE_SIZE, MLV_COLOR_BLACK);
@@ -70,19 +79,8 @@ void affiche_lignes(Game g, int window_width, int window_height) {
 
 int convert_screen_coords_to_grid_coords(Game g, int window_width, int window_height, int x_souris, int y_souris, int* x, int* y) {
     if ((0 <= x_souris && x_souris < window_width) || (0 <= y_souris && y_souris < window_height)) {
-        // A améliorer
-        for (int i = 0; i < g.width; i++) {
-            if ((i * SQUARE_SIZE) <= x_souris && x_souris <= ((i + 1) * SQUARE_SIZE)) {
-                *x = i;
-                break;
-            }
-        }
-        for (int j = 0; j < g.height; j++) {
-            if ((j * SQUARE_SIZE) <= y_souris && y_souris <= ((j + 1) * SQUARE_SIZE)) {
-                *y = j;
-                break;
-            }
-        }
+        *x = x_souris / SQUARE_SIZE;
+        *y = y_souris / SQUARE_SIZE;
         return 0;
     }
     return 1;
