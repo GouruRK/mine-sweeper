@@ -53,7 +53,9 @@ int convert_screen_coords_to_grid_coords(Game g, int window_width, int window_he
 /**
  * Gère les interractions avec l'utilisateur et le programme
 */
-int play(Game g, int window_width, int window_height);
+void play(Game g, int window_width, int window_height);
+
+
 /* * * * * * * */
 /*  Fonctions */
 /* * * * * * * */
