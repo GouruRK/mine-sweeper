@@ -5,7 +5,7 @@
 /*    Define   */
 /* * * * * * * */
 
-#define SQUARE_SIZE 100
+#define SQUARE_SIZE 75
 
 /* * * * * * * */
 /*  Structures */
@@ -53,7 +53,7 @@ int convert_screen_coords_to_grid_coords(int window_width, int window_height, in
 /**
  * Gère les interractions avec l'utilisateur et le programme
 */
-void play(Game* g, int window_width, int window_height);
+void play(Game* g, int window_width, int window_height, int* clique_droit);
 
 /**
  * Permet de savoir s'il y a une mine au coordonnée (x, y)
@@ -76,8 +76,6 @@ int Pied_g(Game* g, int x, int y);
  * Pose un drapeau sur la case (x, y) si c'est possible
 */
 void Drapeau_g(Game* g, int x, int y);
-
-void print_g(Game* g);
 
 /* * * * * * * */
 /*  Fonctions */
@@ -111,7 +109,7 @@ int convert_screen_coords_to_grid_coords(int window_width, int window_height, in
     return 1;
 }
 
-void play(Game* g, int window_width, int window_height) {
+void play(Game* g, int window_width, int window_height, int* clique_droit) {
     // On regarde si l'utilisateur a cliqué :
     int x_souris, y_souris;
     int x, y;
@@ -148,10 +146,13 @@ void play(Game* g, int window_width, int window_height) {
                                  );
                 }
             MLV_update_window();
-            print_g(g);
-            printf("------------------------------------------------------------\n");
+            *clique_droit = 0;
             }
         } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
+            if (*clique_droit) {
+                return;
+            }
+            *clique_droit = 1; 
             int previous = g -> terrain[y][x];
             Drapeau_g(g, x, y);
             if (previous != g -> terrain[y][x]) {
@@ -172,11 +173,11 @@ void play(Game* g, int window_width, int window_height) {
                                              );
                 }
                 MLV_update_window();
-                print_g(g);
-                printf("------------------------------------------------------------\n");
             }
+        } else {
+            *clique_droit = 0; 
         }
-    }    
+    }   
 }
 
 void affiche_t_main(Game g) {
@@ -193,8 +194,9 @@ void affiche_t_main(Game g) {
     // Tant que l'utilisateur ne ferme pas la fenêtre
     affiche_lignes(g, window_width, window_height);
     MLV_update_window();
+    int clic_gauche = 0;
     do {
-        play(&g, window_width, window_height);
+        play(&g, window_width, window_height, &clic_gauche);
         // affiche_lignes(g, window_width, window_height);
         // MLV_update_window();
     } while (!arret);
@@ -265,21 +267,12 @@ void Drapeau_g(Game* g, int x, int y){
     }
 }
 
-void print_g(Game* g) {
-    for (int y = 0; y < g -> height; y++){
-        for (int x = 0; x < g -> width; x++){
-            printf("%d ", g -> terrain[y][x]);
-        }
-        printf("\n");
-    }
-}
-
 // Initialisation
 
 void init_t(Game* g) {
     g -> width = 10;
     g -> height = 6;
-    g -> mines = 8;
+    g -> mines = 7;
     g -> termine = 0; // on suppose que `termine` est un "bool"
     int template[6][10] = {
         {0, 0, 9, 9, 0, 9, 0, 0, 0, 0},
@@ -300,7 +293,7 @@ void init_t(Game* g) {
         }
         terrain[i] = ligne;
     }
-    g->terrain = terrain;
+    g -> terrain = terrain;
 }
 
 /* * * * * * * */
