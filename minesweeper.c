@@ -77,6 +77,8 @@ int Pied_g(Game* g, int x, int y);
 */
 void Drapeau_g(Game* g, int x, int y);
 
+void print_g(Game* g);
+
 /* * * * * * * */
 /*  Fonctions */
 /* * * * * * * */
@@ -116,22 +118,63 @@ void play(Game* g, int window_width, int window_height) {
     MLV_get_mouse_position(&x_souris, &y_souris);
     if(!convert_screen_coords_to_grid_coords(window_width, window_height, x_souris, y_souris, &x, &y)) { // si l'utilisateur a cliqué dans la fenêtre
         if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
-            MLV_draw_filled_rectangle(
-                                     x * SQUARE_SIZE + 1,
-                                     y * SQUARE_SIZE + 1,
-                                     SQUARE_SIZE-1,
-                                     SQUARE_SIZE-1,
-                                     MLV_COLOR_WHITE
+            int prev = g -> terrain[y][x];
+            int explose = Pied_g(g, x, y);
+            if (prev != g -> terrain[y][x]) { // Si on a pas encore découvert la case
+                MLV_draw_filled_rectangle(
+                                         x * SQUARE_SIZE + 1,
+                                         y * SQUARE_SIZE + 1,
+                                         SQUARE_SIZE-1,
+                                         SQUARE_SIZE-1,
+                                         MLV_COLOR_WHITE
+                                         );
+                if (!explose) { // si on a pas explosé
+                    if (g -> terrain[y][x] != -11) {
+                        MLV_draw_text(
+                                     x * SQUARE_SIZE + SQUARE_SIZE/2,
+                                     y * SQUARE_SIZE + SQUARE_SIZE/2,
+                                     "%d",
+                                     MLV_COLOR_BLACK,
+                                     g -> terrain[y][x]
                                      );
-            MLV_draw_text(
-                         x * SQUARE_SIZE + SQUARE_SIZE/2,
-                         y * SQUARE_SIZE + SQUARE_SIZE/2,
-                         "%d",
-                         MLV_COLOR_BLACK,
-                         g -> terrain[y][x]
-                         );
+                                    
+                    }
+                } else {
+                    MLV_draw_text(
+                                 x * SQUARE_SIZE + SQUARE_SIZE/2 - 20,
+                                 y * SQUARE_SIZE + SQUARE_SIZE/2,
+                                 "Boom !",
+                                 MLV_COLOR_BLACK
+                                 );
+                }
+            MLV_update_window();
+            print_g(g);
+            printf("------------------------------------------------------------\n");
+            }
         } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
-            /* Noting */
+            int previous = g -> terrain[y][x];
+            Drapeau_g(g, x, y);
+            if (previous != g -> terrain[y][x]) {
+                if (g -> terrain[y][x] == -9 || g -> terrain[y][x] == -10) { // On dessine le drapeau
+                    MLV_draw_text(
+                                 x * SQUARE_SIZE + SQUARE_SIZE/2 - 30,
+                                 y * SQUARE_SIZE + SQUARE_SIZE/2,
+                                 "Drapeau !",
+                                 MLV_COLOR_BLACK
+                                 );
+                } else { // on enlève le drapeau
+                    MLV_draw_filled_rectangle(
+                                             x * SQUARE_SIZE + 1,
+                                             y * SQUARE_SIZE + 1,
+                                             SQUARE_SIZE-1,
+                                             SQUARE_SIZE-1,
+                                             MLV_COLOR_GRAY
+                                             );
+                }
+                MLV_update_window();
+                print_g(g);
+                printf("------------------------------------------------------------\n");
+            }
         }
     }    
 }
@@ -149,10 +192,11 @@ void affiche_t_main(Game g) {
     
     // Tant que l'utilisateur ne ferme pas la fenêtre
     affiche_lignes(g, window_width, window_height);
+    MLV_update_window();
     do {
         play(&g, window_width, window_height);
         // affiche_lignes(g, window_width, window_height);
-        MLV_update_window();   
+        // MLV_update_window();
     } while (!arret);
 
     // on ferme la fenêtre
@@ -184,7 +228,7 @@ int nbmines_g(Game* g, int x, int y) {
     };
     int cpt = 0;
     for (int k = 0; k < 8; k++) {
-        cpt += hasmine_g(g, coords[k][1], coords[k][0]);
+        cpt += hasmine_g(g, coords[k][0], coords[k][1]);
     }
     return cpt;
 }
@@ -221,6 +265,15 @@ void Drapeau_g(Game* g, int x, int y){
     }
 }
 
+void print_g(Game* g) {
+    for (int y = 0; y < g -> height; y++){
+        for (int x = 0; x < g -> width; x++){
+            printf("%d ", g -> terrain[y][x]);
+        }
+        printf("\n");
+    }
+}
+
 // Initialisation
 
 void init_t(Game* g) {
@@ -249,29 +302,6 @@ void init_t(Game* g) {
     }
     g->terrain = terrain;
 }
-
-    // g -> <terrain = {
-    //     {0, 0, 9, 9, 0, 9, 0, 0, 0, 0},
-    //     {0, 2, 0, 3, 0, 0, 0, 0, 0, 0},
-    //     {0, 1, 9, 0, 0, 0, 0, 0, 0, 0},
-    //     {0, 0, 0, 0, 0, 0, 0, 0, 9, 9},
-    //     {0, 0, 0, 0, 0, 0, 0, 0, 9, 0},
-    //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-    // };
-    // int l1[10] = {0, 0, 9, 9, 0, 9, 0, 0, 0, 0};
-    // int l2[10] = {0, 2, 0, 3, 0, 0, 0, 0, 0, 0};
-    // int l3[10] = {0, 1, 9, 0, 0, 0, 0, 0, 0, 0};
-    // int l4[10] = {0, 0, 0, 0, 0, 0, 0, 0, 9, 9};
-    // int l5[10] = {0, 0, 0, 0, 0, 0, 0, 0, 9, 0};
-    // int l6[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};   
-    // int *vect[6];
-    // vect[0] = l1;
-    // vect[1] = l2;
-    // vect[2] = l3;
-    // vect[3] = l4;
-    // vect[4] = l5;
-    // vect[5] = l6;
-    // g -> terrain = vect;
 
 /* * * * * * * */
 /*    main     */
