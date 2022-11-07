@@ -77,6 +77,12 @@ int Pied_g(Game* g, int x, int y);
 */
 void Drapeau_g(Game* g, int x, int y);
 
+/**
+ * Révèle une case et les cases adjacentes si pas de mines dessus
+ * Propage la fonction aux cases adjacentes
+*/
+void revele_propagation(Game* g, int x, int y);
+
 /* * * * * * * */
 /*  Fonctions */
 /* * * * * * * */
@@ -109,6 +115,54 @@ int convert_screen_coords_to_grid_coords(int window_width, int window_height, in
     return 1;
 }
 
+void revele_propagation(Game* g, int x, int y) {
+    if ((0 <= x && x < g->width) && (0 <= y && y < g->height)) {
+        int prev = g->terrain[y][x];
+        int explose = Pied_g(g, x, y);
+        if (prev != g->terrain[y][x]) { // Si on a pas encore découvert la case
+            MLV_draw_filled_rectangle(
+                                    x * SQUARE_SIZE + 1,
+                                    y * SQUARE_SIZE + 1,
+                                    SQUARE_SIZE-1,
+                                    SQUARE_SIZE-1,
+                                    MLV_COLOR_WHITE
+                                    );
+            if (!explose) { // si on explose pas
+                if (g->terrain[y][x] != -11) {
+                    MLV_draw_text(
+                                 x * SQUARE_SIZE + SQUARE_SIZE/2,
+                                 y * SQUARE_SIZE + SQUARE_SIZE/2,
+                                 "%d",
+                                 MLV_COLOR_BLACK,
+                                 g->terrain[y][x]
+                                 );
+                } else if (g->terrain[y][x] == -11) {
+                    int adjacentes[4][2] = {
+                        {x+1, y},
+                        {x-1, y},
+                        {x, y+1},
+                        {x, y-1}
+                    };
+                    for (int i = 0; i < 4; i++) {
+                        if ((0 <= adjacentes[i][0] && adjacentes[i][0] < g->width) && (0 <= adjacentes[i][1] && adjacentes[i][1] < g->height)) {    
+                            if (g->terrain[adjacentes[i][1]][adjacentes[i][0]] == 0) {
+                                revele_propagation(g, adjacentes[i][0], adjacentes[i][1]);
+                            }
+                        }
+                    }
+                }
+            } else {
+                MLV_draw_text(
+                             x * SQUARE_SIZE + SQUARE_SIZE/2 - 20,
+                             y * SQUARE_SIZE + SQUARE_SIZE/2,
+                             "Boom !",
+                             MLV_COLOR_BLACK
+                             );
+            }
+        }
+    }
+}
+
 void play(Game* g, int window_width, int window_height, int* clique_droit) {
     // On regarde si l'utilisateur a cliqué :
     int x_souris, y_souris;
@@ -116,47 +170,18 @@ void play(Game* g, int window_width, int window_height, int* clique_droit) {
     MLV_get_mouse_position(&x_souris, &y_souris);
     if(!convert_screen_coords_to_grid_coords(window_width, window_height, x_souris, y_souris, &x, &y)) { // si l'utilisateur a cliqué dans la fenêtre
         if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
-            int prev = g -> terrain[y][x];
-            int explose = Pied_g(g, x, y);
-            if (prev != g -> terrain[y][x]) { // Si on a pas encore découvert la case
-                MLV_draw_filled_rectangle(
-                                         x * SQUARE_SIZE + 1,
-                                         y * SQUARE_SIZE + 1,
-                                         SQUARE_SIZE-1,
-                                         SQUARE_SIZE-1,
-                                         MLV_COLOR_WHITE
-                                         );
-                if (!explose) { // si on a pas explosé
-                    if (g -> terrain[y][x] != -11) {
-                        MLV_draw_text(
-                                     x * SQUARE_SIZE + SQUARE_SIZE/2,
-                                     y * SQUARE_SIZE + SQUARE_SIZE/2,
-                                     "%d",
-                                     MLV_COLOR_BLACK,
-                                     g -> terrain[y][x]
-                                     );
-                                    
-                    }
-                } else {
-                    MLV_draw_text(
-                                 x * SQUARE_SIZE + SQUARE_SIZE/2 - 20,
-                                 y * SQUARE_SIZE + SQUARE_SIZE/2,
-                                 "Boom !",
-                                 MLV_COLOR_BLACK
-                                 );
-                }
+            revele_propagation(g, x, y);
             MLV_update_window();
             *clique_droit = 0;
-            }
         } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
             if (*clique_droit) {
                 return;
             }
             *clique_droit = 1; 
-            int previous = g -> terrain[y][x];
+            int previous = g->terrain[y][x];
             Drapeau_g(g, x, y);
-            if (previous != g -> terrain[y][x]) {
-                if (g -> terrain[y][x] == -9 || g -> terrain[y][x] == -10) { // On dessine le drapeau
+            if (previous != g->terrain[y][x]) {
+                if (g->terrain[y][x] == -9 || g->terrain[y][x] == -10) { // On dessine le drapeau
                     MLV_draw_text(
                                  x * SQUARE_SIZE + SQUARE_SIZE/2 - 30,
                                  y * SQUARE_SIZE + SQUARE_SIZE/2,
@@ -209,8 +234,8 @@ void affiche_t_main(Game g) {
 // Non graphique
 
 int hasmine_g(Game* g, int x, int y){
-    if ((0 <= x && x < g -> width) && (0 <= y && y < g -> height)) {
-        if (g -> terrain[y][x] == 9 || g -> terrain[y][x] == -9) {
+    if ((0 <= x && x < g->width) && (0 <= y && y < g->height)) {
+        if (g->terrain[y][x] == 9 || g->terrain[y][x] == -9) {
             return 1;
         }
     }
@@ -236,32 +261,32 @@ int nbmines_g(Game* g, int x, int y) {
 }
 
 int Pied_g(Game* g, int x, int y){
-    if (g -> terrain[y][x] == 9) {
-        g -> terrain[y][x] = 10;
+    if (g->terrain[y][x] == 9) {
+        g->terrain[y][x] = 10;
         return 1;
     }
-    if (g -> terrain[y][x] == 0) {
+    if (g->terrain[y][x] == 0) {
         int nb = nbmines_g(g, x, y);
         if (nb) { // nb != 0
-            g -> terrain[y][x] = nb;
+            g->terrain[y][x] = nb;
         } else { 
-            g -> terrain[y][x] = -11;
+            g->terrain[y][x] = -11;
         }
     }
     return 0;
 }
 
 void Drapeau_g(Game* g, int x, int y){
-    if (0 <= x && x < g -> width) {
-        if (0 <= y && y < g -> height) {
-            if (g -> terrain[y][x] == 9) {
-                g -> terrain[y][x] = -9;
-            } else if (g -> terrain[y][x] == -9) {
-                g -> terrain[y][x] = 9;
-            } else if (g -> terrain[y][x] == -10) {
-                g -> terrain[y][x] = 0;
-            } else if (g -> terrain[y][x] == 0) {
-                g -> terrain[y][x] = -10;
+    if (0 <= x && x < g->width) {
+        if (0 <= y && y < g->height) {
+            if (g->terrain[y][x] == 9) {
+                g->terrain[y][x] = -9;
+            } else if (g->terrain[y][x] == -9) {
+                g->terrain[y][x] = 9;
+            } else if (g->terrain[y][x] == -10) {
+                g->terrain[y][x] = 0;
+            } else if (g->terrain[y][x] == 0) {
+                g->terrain[y][x] = -10;
             }
         }
     }
@@ -270,10 +295,10 @@ void Drapeau_g(Game* g, int x, int y){
 // Initialisation
 
 void init_t(Game* g) {
-    g -> width = 10;
-    g -> height = 6;
-    g -> mines = 7;
-    g -> termine = 0; // on suppose que `termine` est un "bool"
+    g->width = 10;
+    g->height = 6;
+    g->mines = 7;
+    g->termine = 0; // on suppose que `termine` est un "bool"
     int template[6][10] = {
         {0, 0, 9, 9, 0, 9, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -282,18 +307,18 @@ void init_t(Game* g) {
         {0, 0, 0, 0, 0, 0, 0, 0, 9, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
-    int** terrain = malloc(g -> height * sizeof(int*));
+    int** terrain = malloc(g->height * sizeof(int*));
     if (terrain == NULL) exit(1);
     
-    for (int i = 0; i < g -> height; i++) {
-        int* ligne = calloc(g -> width, sizeof(int));
+    for (int i = 0; i < g->height; i++) {
+        int* ligne = calloc(g->width, sizeof(int));
         if (ligne == NULL) exit(1);
-        for (int j = 0; j < g -> width; j++) {
+        for (int j = 0; j < g->width; j++) {
             ligne[j] = template[i][j];
         }
         terrain[i] = ligne;
     }
-    g -> terrain = terrain;
+    g->terrain = terrain;
 }
 
 /* * * * * * * */
