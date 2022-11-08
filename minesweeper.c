@@ -140,13 +140,17 @@ void revele_propagation(Game* g, int x, int y) {
                                  g->terrain[y][x]
                                  );
                 } else if (g->terrain[y][x] == -11) {
-                    int adjacentes[4][2] = {
+                    int adjacentes[8][2] = {
                         {x+1, y},
-                        {x-1, y},
+                        {x+1, y+1},
+                        {x+1, y-1},
                         {x, y+1},
-                        {x, y-1}
+                        {x, y-1},
+                        {x-1, y},
+                        {x-1, y+1},
+                        {x-1, y-1}
                     };
-                    for (int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 8; i++) {
                         if ((0 <= adjacentes[i][0] && adjacentes[i][0] < g->width) && (0 <= adjacentes[i][1] && adjacentes[i][1] < g->height)) {    
                             if (g->terrain[adjacentes[i][1]][adjacentes[i][0]] == 0) {
                                 revele_propagation(g, adjacentes[i][0], adjacentes[i][1]);
@@ -166,7 +170,29 @@ void revele_propagation(Game* g, int x, int y) {
     }
 }
 
-void poser_drapeau(void);
+void poser_drapeau(Game* g, int x, int y) {
+    int previous = g->terrain[y][x];
+    Drapeau_g(g, x, y);
+    if (previous != g->terrain[y][x]) {
+        if (g->terrain[y][x] == -9 || g->terrain[y][x] == -10) { // On dessine le drapeau
+            MLV_draw_text(
+                            x * SQUARE_SIZE + SQUARE_SIZE/2 - 30,
+                            y * SQUARE_SIZE + SQUARE_SIZE/2,
+                            "Drapeau !",
+                            MLV_COLOR_BLACK
+                            );
+        } else { // on enlève le drapeau
+            MLV_draw_filled_rectangle(
+                                        x * SQUARE_SIZE + 1,
+                                        y * SQUARE_SIZE + 1,
+                                        SQUARE_SIZE-1,
+                                        SQUARE_SIZE-1,
+                                        MLV_COLOR_GRAY
+                                        );
+        }
+        MLV_update_window();
+    }
+}
 
 int perdu(Game* g) {
     for (int y = 0; y < g->height; y++) {
@@ -178,39 +204,6 @@ int perdu(Game* g) {
     }
     return 0;
 }
-
-void play(Game* g, int x, int y) {
-    if (perdu(g)) return;
-    // on regarde sur quelles cases l'utilisateur a cliqué
-    convert_screen_coords_to_grid_coords(&x, &y);
-    if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
-        revele_propagation(g, x, y);
-        MLV_update_window();
-    } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
-        int previous = g->terrain[y][x];
-        Drapeau_g(g, x, y);
-        if (previous != g->terrain[y][x]) {
-            if (g->terrain[y][x] == -9 || g->terrain[y][x] == -10) { // On dessine le drapeau
-                MLV_draw_text(
-                             x * SQUARE_SIZE + SQUARE_SIZE/2 - 30,
-                             y * SQUARE_SIZE + SQUARE_SIZE/2,
-                             "Drapeau !",
-                             MLV_COLOR_BLACK
-                             );
-            } else { // on enlève le drapeau
-                MLV_draw_filled_rectangle(
-                                         x * SQUARE_SIZE + 1,
-                                         y * SQUARE_SIZE + 1,
-                                         SQUARE_SIZE-1,
-                                         SQUARE_SIZE-1,
-                                         MLV_COLOR_GRAY
-                                         );
-            }
-            MLV_update_window();
-        }
-    }
-}   
-
 
 void affiche_control_panel(Game g, int game_panel_width, int game_panel_height, int control_panel_height) {
     MLV_draw_filled_rectangle(0, game_panel_height + 1, game_panel_width, game_panel_height + control_panel_height, MLV_COLOR_WHITE);
@@ -245,12 +238,14 @@ void action(Game g, int game_panel_width, int game_panel_height, int control_pan
     if ((0 <= x && x < window_width) && (0 <= y && y < window_height)) {
         // Si on a cliqué dans le panel de jeu
         if (0 <= y && y < game_panel_height) {
+            convert_screen_coords_to_grid_coords(&x, &y);
+            if (perdu(&g)) return;
             if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
-                convert_screen_coords_to_grid_coords(&x, &y);
                 revele_propagation(&g, x, y);
                 MLV_update_window();
             } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
-                /*poser_drapeau*/
+                poser_drapeau(&g, x, y);
+                MLV_wait_milliseconds(200);
             }
         } else { // Si on a cliqué dans le panel des boutons
             if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) {
@@ -264,7 +259,7 @@ void action(Game g, int game_panel_width, int game_panel_height, int control_pan
                 // Si l'utilisateur veut recommencer
                 MLV_get_size_of_text("Recommencer", &w, &h);
                 if ((game_panel_width - 100 - w/2 <= x && x <= game_panel_width - 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
-                    MLV_wait_milliseconds(500);
+                    MLV_wait_milliseconds(200);
                 }
             }
         }
