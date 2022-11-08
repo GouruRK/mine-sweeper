@@ -118,20 +118,19 @@ void lecture_tableau(FILE* fichier, Game* g) {
         c = fgetc(fichier);
     }
     g->terrain[x][y] = val;
-        // printf("x:%d y:%d ", x, y);
-        // printf("%c\n", c);
-} 
+    // printf("x:%d y:%d ", x, y);
+    // printf("%c\n", c);
+}
 
-    /*
+/*
+printf("\n");
+for(int i = 0; i < g->height; i++){
     printf("\n");
-    for(int i = 0; i < g->height; i++){
-        printf("\n");
-        for(int j = 0; j < g->width; j++){
-            printf("%d ",g->terrain[i][j]);
-        }
+    for(int j = 0; j < g->width; j++){
+        printf("%d ",g->terrain[i][j]);
     }
-    */
-
+}
+*/
 
 void lecture(Game* g) {
     for (int i = 0; i < g->height; i++) {
@@ -149,13 +148,7 @@ void lecture(Game* g) {
 int main(int argc, char* argv[]) {
     Game g;
     lecture_arguments(argc, argv, &g);
-    //printf("\n");
+    // printf("\n");
     lecture(&g);
-    // for (int i = 0; i < g.height; i++) {
-    //     printf("\n");
-    //     for (int j = 0; j < g.width; j++) {
-    //         printf("%d ", g.terrain[i][j]);
-    //     }
-    // }
     return 0;
 }
