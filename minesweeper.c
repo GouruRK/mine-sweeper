@@ -36,7 +36,7 @@ void stop_affichage(void* data);
 /**
  * Permet d'afficher les lignes
 */
-void affiche_lignes(Game g, int window_width, int window_height);
+void affiche_lignes(Game g, int game_panel_width, int game_panel_height);
 
 /**
  * Fonction principale de l'affichage du terrain
@@ -48,12 +48,12 @@ void affiche_t_main(Game g);
  * Modifie les variables x et y en les coordonnées
  * Retourne 0 si la souris est dans la fenêtre, 1 sinon
 */
-int convert_screen_coords_to_grid_coords(int window_width, int window_height, int x_souris, int y_souris, int* x, int* y);
+int convert_screen_coords_to_grid_coords(int game_panel_width, int game_panel_height, int x_souris, int y_souris, int* x, int* y);
 
 /**
  * Gère les interractions avec l'utilisateur et le programme
 */
-void play(Game* g, int window_width, int window_height, int* clique_droit);
+void play(Game* g, int game_panel_width, int game_panel_height, int* clique_droit);
 
 /**
  * Permet de savoir s'il y a une mine au coordonnée (x, y)
@@ -83,6 +83,12 @@ void Drapeau_g(Game* g, int x, int y);
 */
 void revele_propagation(Game* g, int x, int y);
 
+/**
+ * Renvoie 1 si la partie est perdue
+ * O sinon
+*/
+int perdu(Game* g);
+
 /* * * * * * * */
 /*  Fonctions */
 /* * * * * * * */
@@ -94,20 +100,21 @@ void stop_affichage(void* data){
 	*arret = 1;
 }
 
-void affiche_lignes(Game g, int window_width, int window_height) {
+void affiche_lignes(Game g, int game_panel_width, int game_panel_height) {
+    MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height, MLV_COLOR_GRAY);
     // les lignes horizontales
-    for (int y = 0; y < g.height + 2; y++) {
-        MLV_draw_line(0, y * SQUARE_SIZE, window_width, y * SQUARE_SIZE, MLV_COLOR_BLACK);
+    for (int y = 0; y < g.height + 1; y++) {
+        MLV_draw_line(0, y * SQUARE_SIZE, game_panel_width, y * SQUARE_SIZE, MLV_COLOR_BLACK);
     }
 
     // les lignes verticales
-    for (int x = 0; x < g.width + 2; x++) {
-        MLV_draw_line(x * SQUARE_SIZE, 0, x * SQUARE_SIZE, window_height, MLV_COLOR_BLACK);
+    for (int x = 0; x < g.width + 1; x++) {
+        MLV_draw_line(x * SQUARE_SIZE, 0, x * SQUARE_SIZE, game_panel_height, MLV_COLOR_BLACK);
     }
 }
 
-int convert_screen_coords_to_grid_coords(int window_width, int window_height, int x_souris, int y_souris, int* x, int* y) {
-    if ((0 <= x_souris && x_souris < window_width) || (0 <= y_souris && y_souris < window_height)) {
+int convert_screen_coords_to_grid_coords(int game_panel_width, int game_panel_height, int x_souris, int y_souris, int* x, int* y) {
+    if ((0 <= x_souris && x_souris < game_panel_width) || (0 <= y_souris && y_souris < game_panel_height)) {
         *x = x_souris / SQUARE_SIZE;
         *y = y_souris / SQUARE_SIZE;
         return 0;
@@ -163,12 +170,24 @@ void revele_propagation(Game* g, int x, int y) {
     }
 }
 
-void play(Game* g, int window_width, int window_height, int* clique_droit) {
+int perdu(Game* g) {
+    for (int y = 0; y < g->height; y++) {
+        for (int x = 0; x < g->width; x++) {
+            if (g->terrain[y][x] == 10) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+void play(Game* g, int game_panel_width, int game_panel_height, int* clique_droit) {
+    if (perdu(g)) return;
     // On regarde si l'utilisateur a cliqué :
     int x_souris, y_souris;
     int x, y;
     MLV_get_mouse_position(&x_souris, &y_souris);
-    if(!convert_screen_coords_to_grid_coords(window_width, window_height, x_souris, y_souris, &x, &y)) { // si l'utilisateur a cliqué dans la fenêtre
+    if(!convert_screen_coords_to_grid_coords(game_panel_width, game_panel_height, x_souris, y_souris, &x, &y)) { // si l'utilisateur a cliqué dans la fenêtre
         if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
             revele_propagation(g, x, y);
             MLV_update_window();
@@ -205,24 +224,52 @@ void play(Game* g, int window_width, int window_height, int* clique_droit) {
     }   
 }
 
+void affiche_control_panel(Game g, int game_panel_width, int game_panel_height, int control_panel_height) {
+    MLV_draw_filled_rectangle(0, game_panel_height + 1, game_panel_width, game_panel_height + control_panel_height, MLV_COLOR_WHITE);
+    int y = game_panel_height + (control_panel_height / 2);
+    int w, h;
+    MLV_get_size_of_text("Quitter", &w, &h);
+    MLV_draw_text(100 - w/2,
+                 y - h/2,
+                 "Quitter",
+                 MLV_COLOR_BLACK
+                 );
+    MLV_get_size_of_text("Nombre de mines : 1", &w, &h);
+    MLV_draw_text(game_panel_width / 2 - w/2,
+                 y - h/2,
+                 "Nombre de mines : %d",
+                 MLV_COLOR_BLACK,
+                 g.mines
+                 );
+    MLV_get_size_of_text("Recommencer", &w, &h);
+    MLV_draw_text(game_panel_width - 100 - w/2,
+                 y - h/2,
+                 "Recommencer",
+                 MLV_COLOR_BLACK,
+                 g.mines
+                 );
+}
+
 void affiche_t_main(Game g) {
     int arret = 0; 
     // On enregistre la fonction de call back
     MLV_execute_at_exit(stop_affichage, &arret);
 
     // Création de la fenêtre
-    int window_width = (g.width) * SQUARE_SIZE;
-    int window_height = (g.height) * SQUARE_SIZE;
-    MLV_create_window("Minesweeper", "minesweeper", window_width, window_height);
-    MLV_draw_filled_rectangle(0, 0, window_width, window_height, MLV_COLOR_GRAY);
+    int game_panel_width = (g.width) * SQUARE_SIZE;
+    int game_panel_height = (g.height) * SQUARE_SIZE;
+    int control_panel_height = 100;
+    MLV_create_window("Minesweeper", "minesweeper", game_panel_width, game_panel_height + control_panel_height);
     
     // Tant que l'utilisateur ne ferme pas la fenêtre
-    affiche_lignes(g, window_width, window_height);
+    affiche_lignes(g, game_panel_width, game_panel_height);
+    affiche_control_panel(g, game_panel_width, game_panel_height, control_panel_height);
     MLV_update_window();
+
     int clic_gauche = 0;
     do {
-        play(&g, window_width, window_height, &clic_gauche);
-        // affiche_lignes(g, window_width, window_height);
+        play(&g, game_panel_width, game_panel_height, &clic_gauche);
+        // affiche_lignes(g, game_panel_width, game_panel_height);
         // MLV_update_window();
     } while (!arret);
 
