@@ -48,12 +48,12 @@ void affiche_t_main(Game g);
  * Modifie les variables x et y en les coordonnées
  * Retourne 0 si la souris est dans la fenêtre, 1 sinon
 */
-int convert_screen_coords_to_grid_coords(int game_panel_width, int game_panel_height, int x_souris, int y_souris, int* x, int* y);
+void convert_screen_coords_to_grid_coords(int* x, int* y);
 
 /**
  * Gère les interractions avec l'utilisateur et le programme
 */
-void play(Game* g, int game_panel_width, int game_panel_height, int* clique_droit);
+void play(Game* g, int x, int y);
 
 /**
  * Permet de savoir s'il y a une mine au coordonnée (x, y)
@@ -113,13 +113,9 @@ void affiche_lignes(Game g, int game_panel_width, int game_panel_height) {
     }
 }
 
-int convert_screen_coords_to_grid_coords(int game_panel_width, int game_panel_height, int x_souris, int y_souris, int* x, int* y) {
-    if ((0 <= x_souris && x_souris < game_panel_width) || (0 <= y_souris && y_souris < game_panel_height)) {
-        *x = x_souris / SQUARE_SIZE;
-        *y = y_souris / SQUARE_SIZE;
-        return 0;
-    }
-    return 1;
+void convert_screen_coords_to_grid_coords(int* x, int* y) {
+    *x = *x / SQUARE_SIZE;
+    *y = *y / SQUARE_SIZE;
 }
 
 void revele_propagation(Game* g, int x, int y) {
@@ -170,6 +166,8 @@ void revele_propagation(Game* g, int x, int y) {
     }
 }
 
+void poser_drapeau(void);
+
 int perdu(Game* g) {
     for (int y = 0; y < g->height; y++) {
         for (int x = 0; x < g->width; x++) {
@@ -181,48 +179,38 @@ int perdu(Game* g) {
     return 0;
 }
 
-void play(Game* g, int game_panel_width, int game_panel_height, int* clique_droit) {
+void play(Game* g, int x, int y) {
     if (perdu(g)) return;
-    // On regarde si l'utilisateur a cliqué :
-    int x_souris, y_souris;
-    int x, y;
-    MLV_get_mouse_position(&x_souris, &y_souris);
-    if(!convert_screen_coords_to_grid_coords(game_panel_width, game_panel_height, x_souris, y_souris, &x, &y)) { // si l'utilisateur a cliqué dans la fenêtre
-        if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
-            revele_propagation(g, x, y);
+    // on regarde sur quelles cases l'utilisateur a cliqué
+    convert_screen_coords_to_grid_coords(&x, &y);
+    if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
+        revele_propagation(g, x, y);
+        MLV_update_window();
+    } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
+        int previous = g->terrain[y][x];
+        Drapeau_g(g, x, y);
+        if (previous != g->terrain[y][x]) {
+            if (g->terrain[y][x] == -9 || g->terrain[y][x] == -10) { // On dessine le drapeau
+                MLV_draw_text(
+                             x * SQUARE_SIZE + SQUARE_SIZE/2 - 30,
+                             y * SQUARE_SIZE + SQUARE_SIZE/2,
+                             "Drapeau !",
+                             MLV_COLOR_BLACK
+                             );
+            } else { // on enlève le drapeau
+                MLV_draw_filled_rectangle(
+                                         x * SQUARE_SIZE + 1,
+                                         y * SQUARE_SIZE + 1,
+                                         SQUARE_SIZE-1,
+                                         SQUARE_SIZE-1,
+                                         MLV_COLOR_GRAY
+                                         );
+            }
             MLV_update_window();
-            *clique_droit = 0;
-        } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
-            if (*clique_droit) {
-                return;
-            }
-            *clique_droit = 1; 
-            int previous = g->terrain[y][x];
-            Drapeau_g(g, x, y);
-            if (previous != g->terrain[y][x]) {
-                if (g->terrain[y][x] == -9 || g->terrain[y][x] == -10) { // On dessine le drapeau
-                    MLV_draw_text(
-                                 x * SQUARE_SIZE + SQUARE_SIZE/2 - 30,
-                                 y * SQUARE_SIZE + SQUARE_SIZE/2,
-                                 "Drapeau !",
-                                 MLV_COLOR_BLACK
-                                 );
-                } else { // on enlève le drapeau
-                    MLV_draw_filled_rectangle(
-                                             x * SQUARE_SIZE + 1,
-                                             y * SQUARE_SIZE + 1,
-                                             SQUARE_SIZE-1,
-                                             SQUARE_SIZE-1,
-                                             MLV_COLOR_GRAY
-                                             );
-                }
-                MLV_update_window();
-            }
-        } else {
-            *clique_droit = 0; 
         }
-    }   
-}
+    }
+}   
+
 
 void affiche_control_panel(Game g, int game_panel_width, int game_panel_height, int control_panel_height) {
     MLV_draw_filled_rectangle(0, game_panel_height + 1, game_panel_width, game_panel_height + control_panel_height, MLV_COLOR_WHITE);
@@ -250,6 +238,39 @@ void affiche_control_panel(Game g, int game_panel_width, int game_panel_height, 
                  );
 }
 
+void action(Game g, int game_panel_width, int game_panel_height, int control_panel_height, int x, int y, int* arret) {
+    // Si l'utilisateur a cliqué dans la fenêtre
+    int window_width = game_panel_width;
+    int window_height = game_panel_height + control_panel_height;
+    if ((0 <= x && x < window_width) && (0 <= y && y < window_height)) {
+        // Si on a cliqué dans le panel de jeu
+        if (0 <= y && y < game_panel_height) {
+            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
+                convert_screen_coords_to_grid_coords(&x, &y);
+                revele_propagation(&g, x, y);
+                MLV_update_window();
+            } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
+                /*poser_drapeau*/
+            }
+        } else { // Si on a cliqué dans le panel des boutons
+            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) {
+                int w, h;
+                int panel_middle = game_panel_height + (control_panel_height / 2);
+                // Si l'utilisateur veut quitter
+                MLV_get_size_of_text("Quitter", &w, &h);
+                if ((100 - w/2 <= x && x <= 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                    *arret = 1;
+                }
+                // Si l'utilisateur veut recommencer
+                MLV_get_size_of_text("Recommencer", &w, &h);
+                if ((game_panel_width - 100 - w/2 <= x && x <= game_panel_width - 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                    MLV_wait_milliseconds(500);
+                }
+            }
+        }
+    }
+}
+
 void affiche_t_main(Game g) {
     int arret = 0; 
     // On enregistre la fonction de call back
@@ -261,16 +282,16 @@ void affiche_t_main(Game g) {
     int control_panel_height = 100;
     MLV_create_window("Minesweeper", "minesweeper", game_panel_width, game_panel_height + control_panel_height);
     
-    // Tant que l'utilisateur ne ferme pas la fenêtre
+    // Affichage des différents "panels" (la grille et les boutons)
     affiche_lignes(g, game_panel_width, game_panel_height);
     affiche_control_panel(g, game_panel_width, game_panel_height, control_panel_height);
     MLV_update_window();
-
-    int clic_gauche = 0;
+    
+    // Tant que l'utilisateur ne ferme pas la fenêtre
+    int x, y;
     do {
-        play(&g, game_panel_width, game_panel_height, &clic_gauche);
-        // affiche_lignes(g, game_panel_width, game_panel_height);
-        // MLV_update_window();
+        MLV_get_mouse_position(&x, &y);
+        action(g, game_panel_width, game_panel_height, control_panel_height, x, y, &arret);
     } while (!arret);
 
     // on ferme la fenêtre
