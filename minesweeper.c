@@ -231,6 +231,23 @@ void affiche_control_panel(Game g, int game_panel_width, int game_panel_height, 
                  );
 }
 
+void re_init(Game* g, int game_panel_width, int game_panel_height, int control_panel_height) {
+    // On réinitialise le plateau
+    for (int y = 0; y < g->height; y++) {
+        for (int x = 0; x < g->width; x++) {
+            if (g->terrain[y][x] == -9) {
+                g->terrain[y][x] = 9;
+            } else if (g->terrain[y][x] != 9) {
+                g->terrain[y][x] = 0;
+            }
+        }
+    }
+    MLV_clear_window(MLV_COLOR_WHITE);
+    affiche_lignes(*g, game_panel_width, game_panel_height);
+    affiche_control_panel(*g, game_panel_width, game_panel_height, control_panel_height);
+    MLV_update_window();
+}
+
 void action(Game g, int game_panel_width, int game_panel_height, int control_panel_height, int x, int y, int* arret) {
     // Si l'utilisateur a cliqué dans la fenêtre
     int window_width = game_panel_width;
@@ -259,6 +276,8 @@ void action(Game g, int game_panel_width, int game_panel_height, int control_pan
                 // Si l'utilisateur veut recommencer
                 MLV_get_size_of_text("Recommencer", &w, &h);
                 if ((game_panel_width - 100 - w/2 <= x && x <= game_panel_width - 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                    re_init(&g, game_panel_width, game_panel_height, control_panel_height);
+                    MLV_update_window();
                     MLV_wait_milliseconds(200);
                 }
             }
