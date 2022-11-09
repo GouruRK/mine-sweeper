@@ -24,78 +24,185 @@ typedef struct _game {
 /* * * * * * * */
 
 /**
- * Initialise un terrain
-*/
-void init_t(Game* g);
-
-/**
- * Permet de savoir si l'utilisateur ferme la fenêtre
+ * @brief Enregistrement de la fonction de call back pour la lib MLV
+ *        lors de la fermeture de la fenêtre
+ * 
+ * @param data 
 */
 void stop_affichage(void* data);
 
+
 /**
- * Permet d'afficher les lignes
+ * @brief Permet d'afficher les lignes sur la fenêtre représentant la grille
+ *        de jeu
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param game_panel_width La largeur de la grille de jeu
+ * @param game_panel_height La hauteur de la grille de jeu
 */
 void affiche_lignes(Game g, int game_panel_width, int game_panel_height);
 
 /**
- * Fonction principale de l'affichage du terrain
+ * @brief Affiche les boutons permettant d'interagir avec le programme
+ *        pour quitter ou recommencer une partie
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param control_panel_width La largeur du panel avec les boutons
+ * @param game_panel_height La hauteur du panel de jeu avec la grille 
+ *        représentée. Cette donnée est important car le panel avec les
+ *        boutons se trouvant en dessous de la grille de jeu, il se trouve
+ *        alors a y = game_panel_height
+ * @param control_panel_height La hauteur du panel avec les boutons
 */
-void affiche_t_main(Game g);
+void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
+        int control_panel_height);
 
 /**
- * Permet de convertir les coordonnées de la souris dans les coordonnées du tableau
- * Modifie les variables x et y en les coordonnées
- * Retourne 0 si la souris est dans la fenêtre, 1 sinon
+ * @brief Permet de convertir la position de la souris par sa position dans
+ *        la grille
+ * 
+ * @param x La position en x de la souris, qui est modifié pour prendre la 
+ *          valeur en x dans le tableau
+ * @param y La position en y de la souris, qui est modifié pour prendre la 
+ *          valeur en y dans le tableau
 */
 void convert_screen_coords_to_grid_coords(int* x, int* y);
 
 /**
- * Gère les interractions avec l'utilisateur et le programme
+ * @brief Fonction qui permet d'afficher la fenêtre et d'interagir avec
+ *        l'utilisateur. Elle est également responsable de gérer la 
+ *        fermeture de la fenêtre
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
 */
-void play(Game* g, int x, int y);
+void play(Game g);
 
 /**
- * Permet de savoir s'il y a une mine au coordonnée (x, y)
+ * @brief Fonction permettant de déterminer les actions de l'utilisateur et
+ *        d'agir en conséquence. Les interactions possibles de l'utilisateurs
+ *        sont des clics gauche ou droit.
+ *        Les actions possibles sont :
+ *         - Fermeture du jeu (par la "x" de la fenêtre ou en cliquant sur
+ *           le bouton "Quitter") ;
+ *         - Recommencer la partie (en cliquant sur le bouton "Recommencer");
+ *         - Découvrir une case (en faisant un clique gauche sur la grille);
+ *         - Déposer un drapeau (en faisant un clique droit sur la grille)
+ *
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param game_panel_width La largeur du panel de jeu
+ * @param game_panel_height La hauteur du panel de jeu
+ * @param control_panel_height La hauteur du panel des boutons
+ * @param x La position en x de la souris
+ * @param y La position en y de la souris
+ * @param arret Argument modifié à `1` si l'utilisateur souhaite quitter 
+ *        la partie
+*/
+void action(Game g, int game_panel_width, int game_panel_height,
+        int control_panel_height, int x, int y, int* arret);
+
+/**
+ * @brief Fonction permettant de découvrir une case. Si la case n'est pas une
+ *        mine ou n'est pas adjacente à une mine, elle révèle les cases 
+ *        adjacentes etc. Modifie l'aspect graphique de la grille
+ *
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La position en x de la case a révéler
+ * @param y La position en y de la case a révéler
+*/
+void revele_propagation(Game* g, int x, int y);
+
+/** @brief Permet de poser un drapeau. Si un drapeau est déjà présent,
+ *        le drapeau est retiré. Modifie l'aspect graphique de la grille
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La position en x de la case où poser le drapeau
+ * @param y La position en y de la case où poser le drapeau
+*/
+void poser_drapeau(Game* g, int x, int y);
+
+/**
+ * @brief Permet de savoir si le jeu est perdu. Le jeu est perdu si une 
+ *        mine est découverte
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @return `1` si c'est perdu, `0` sinon
+*/
+int perdu(Game g);
+
+/**
+ * @brief Permet de réinitialiser la grille, et l'affchage de celle ci
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param game_panel_width La largeur du panel de jeu
+ * @param game_panel_height La hauteur du panel de jeu
+ * @param control_panel_height La hauteur du panel des boutons
+*/
+void re_init(Game* g, int game_panel_width, int game_panel_height, 
+        int control_panel_height);
+
+
+/**
+ * @brief Permet de savoir si une case possède une mine
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La coordonnée en x de la case à vérifier
+ * @param y La coordonnée en y de la case à vérifier
+ * @return `1` si la case possède une mine `0` sinon où si les coordonnées
+ *         de la case sont en dehors de la grille
 */
 int hasmine_g(Game* g, int x, int y);
 
 /**
- * Renvoie le nombre de mines il y a autour de la case (x, y) 
- * (la case est exclue)
+ * @brief Permet de savoir combien de mines sont adjacentes a une case
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La coordonnée en x de la case à vérifier
+ * @param y La coordonnée en y de la case à vérifier
+ * @return int : le nombre de mines adjacentes (entre 0 et 8 inclus)
 */
 int nbmines_g(Game* g, int x, int y);
 
 /**
- * Pose le pied sur la case (x, y), modifie la case en conséquence et 
- * renvoie si on a explosé
+ * @brief Permet de découvrir une case. Si la case découverte n'est pas une
+ *        mines mais est adjacentes à d'autres mines, alors son contenu est 
+ *        remplacé par le nombre de mines adjacentes. 
+ *        Ne modifie pas l'aspect graphique
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La coordonnée en x de la case à découvrir
+ * @param y La coordonnée en y de la case à découvrir
+ * @return `1` si la case découverte est une mine, `0` sinon
 */
 int Pied_g(Game* g, int x, int y);
 
 /**
- * Pose un drapeau sur la case (x, y) si c'est possible
+ * @brief Permet de poser un drapeau sur une case, ou de retirer un drapeau
+ *        sur une case qui en possède déjà un. Ne modifie pas l'aspect
+ *        graphique
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La coordonnée en x de la case où poser le drapeau
+ * @param y La coordonnée en y de la case où poser le drapeau
 */
 void Drapeau_g(Game* g, int x, int y);
-
-/**
- * Révèle une case et les cases adjacentes si pas de mines dessus
- * Propage la fonction aux cases adjacentes
-*/
-void revele_propagation(Game* g, int x, int y);
-
-/**
- * Renvoie 1 si la partie est perdue
- * O sinon
-*/
-int perdu(Game* g);
 
 /* * * * * * * */
 /*  Fonctions */
 /* * * * * * * */
 
-// Graphique
-
-void stop_affichage(void* data){
+void stop_affichage(void* data) {
 	int* arret = (int*) data;
 	*arret = 1;
 }
@@ -113,9 +220,99 @@ void affiche_lignes(Game g, int game_panel_width, int game_panel_height) {
     }
 }
 
+void affiche_boutons(Game g, int control_panel_width, int game_panel_height, int control_panel_height) {
+    MLV_draw_filled_rectangle(0, game_panel_height + 1, control_panel_width, game_panel_height + control_panel_height, MLV_COLOR_WHITE);
+    int y = game_panel_height + (control_panel_height / 2);
+    int w, h;
+    MLV_get_size_of_text("Quitter", &w, &h);
+    MLV_draw_text(100 - w/2,
+                 y - h/2,
+                 "Quitter",
+                 MLV_COLOR_BLACK
+                 );
+    MLV_get_size_of_text("Nombre de mines : 1", &w, &h);
+    MLV_draw_text(game_panel_width / 2 - w/2,
+                 y - h/2,
+                 "Nombre de mines : %d",
+                 MLV_COLOR_BLACK,
+                 g.mines
+                 );
+    MLV_get_size_of_text("Recommencer", &w, &h);
+    MLV_draw_text(game_panel_width - 100 - w/2,
+                 y - h/2,
+                 "Recommencer",
+                 MLV_COLOR_BLACK,
+                 g.mines
+                 );
+}
+
 void convert_screen_coords_to_grid_coords(int* x, int* y) {
     *x = *x / SQUARE_SIZE;
     *y = *y / SQUARE_SIZE;
+}
+
+void play(Game g) {
+    int arret = 0; 
+    // On enregistre la fonction de call back
+    MLV_execute_at_exit(stop_affichage, &arret);
+
+    // Création de la fenêtre
+    int game_panel_width = (g.width) * SQUARE_SIZE;
+    int game_panel_height = (g.height) * SQUARE_SIZE;
+    int control_panel_height = 100;
+    MLV_create_window("Minesweeper", "minesweeper", game_panel_width, game_panel_height + control_panel_height);
+    
+    // Affichage des différents "panels" (la grille et les boutons)
+    affiche_lignes(g, game_panel_width, game_panel_height);
+    affiche_boutons(g, game_panel_width, game_panel_height, control_panel_height);
+    MLV_update_window();
+    
+    // Tant que l'utilisateur ne ferme pas la fenêtre
+    int x, y;
+    do {
+        MLV_get_mouse_position(&x, &y);
+        action(g, game_panel_width, game_panel_height, control_panel_height, x, y, &arret);
+    } while (!arret);
+
+    // on ferme la fenêtre
+    MLV_free_window();
+}
+
+void action(Game g, int game_panel_width, int game_panel_height, int control_panel_height, int x, int y, int* arret) {
+    // Si l'utilisateur a cliqué dans la fenêtre
+    int window_width = game_panel_width;
+    int window_height = game_panel_height + control_panel_height;
+    if ((0 <= x && x < window_width) && (0 <= y && y < window_height)) {
+        // Si on a cliqué dans le panel de jeu
+        if (0 <= y && y < game_panel_height) {
+            convert_screen_coords_to_grid_coords(&x, &y);
+            if (perdu(g)) return; // Si le joueur a perdu, il ne peut plus poser de mine ou découvrir des cases
+            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
+                revele_propagation(&g, x, y);
+                MLV_update_window();
+            } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
+                poser_drapeau(&g, x, y);
+                MLV_wait_milliseconds(200);
+            }
+        } else { // Si on a cliqué dans le panel des boutons
+            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) {
+                int w, h;
+                int panel_middle = game_panel_height + (control_panel_height / 2);
+                // Si l'utilisateur veut quitter
+                MLV_get_size_of_text("Quitter", &w, &h);
+                if ((100 - w/2 <= x && x <= 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                    *arret = 1;
+                }
+                // Si l'utilisateur veut recommencer
+                MLV_get_size_of_text("Recommencer", &w, &h);
+                if ((game_panel_width - 100 - w/2 <= x && x <= game_panel_width - 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                    re_init(&g, game_panel_width, game_panel_height, control_panel_height);
+                    MLV_update_window();
+                    MLV_wait_milliseconds(200);
+                }
+            }
+        }
+    }
 }
 
 void revele_propagation(Game* g, int x, int y) {
@@ -194,41 +391,15 @@ void poser_drapeau(Game* g, int x, int y) {
     }
 }
 
-int perdu(Game* g) {
-    for (int y = 0; y < g->height; y++) {
-        for (int x = 0; x < g->width; x++) {
-            if (g->terrain[y][x] == 10) {
+int perdu(Game g) {
+    for (int y = 0; y < g.height; y++) {
+        for (int x = 0; x < g.width; x++) {
+            if (g.terrain[y][x] == 10) {
                 return 1;
             }
         }
     }
     return 0;
-}
-
-void affiche_control_panel(Game g, int game_panel_width, int game_panel_height, int control_panel_height) {
-    MLV_draw_filled_rectangle(0, game_panel_height + 1, game_panel_width, game_panel_height + control_panel_height, MLV_COLOR_WHITE);
-    int y = game_panel_height + (control_panel_height / 2);
-    int w, h;
-    MLV_get_size_of_text("Quitter", &w, &h);
-    MLV_draw_text(100 - w/2,
-                 y - h/2,
-                 "Quitter",
-                 MLV_COLOR_BLACK
-                 );
-    MLV_get_size_of_text("Nombre de mines : 1", &w, &h);
-    MLV_draw_text(game_panel_width / 2 - w/2,
-                 y - h/2,
-                 "Nombre de mines : %d",
-                 MLV_COLOR_BLACK,
-                 g.mines
-                 );
-    MLV_get_size_of_text("Recommencer", &w, &h);
-    MLV_draw_text(game_panel_width - 100 - w/2,
-                 y - h/2,
-                 "Recommencer",
-                 MLV_COLOR_BLACK,
-                 g.mines
-                 );
 }
 
 void re_init(Game* g, int game_panel_width, int game_panel_height, int control_panel_height) {
@@ -244,78 +415,11 @@ void re_init(Game* g, int game_panel_width, int game_panel_height, int control_p
     }
     MLV_clear_window(MLV_COLOR_WHITE);
     affiche_lignes(*g, game_panel_width, game_panel_height);
-    affiche_control_panel(*g, game_panel_width, game_panel_height, control_panel_height);
+    affiche_boutons(*g, game_panel_width, game_panel_height, control_panel_height);
     MLV_update_window();
 }
 
-void action(Game g, int game_panel_width, int game_panel_height, int control_panel_height, int x, int y, int* arret) {
-    // Si l'utilisateur a cliqué dans la fenêtre
-    int window_width = game_panel_width;
-    int window_height = game_panel_height + control_panel_height;
-    if ((0 <= x && x < window_width) && (0 <= y && y < window_height)) {
-        // Si on a cliqué dans le panel de jeu
-        if (0 <= y && y < game_panel_height) {
-            convert_screen_coords_to_grid_coords(&x, &y);
-            if (perdu(&g)) return;
-            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
-                revele_propagation(&g, x, y);
-                MLV_update_window();
-            } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
-                poser_drapeau(&g, x, y);
-                MLV_wait_milliseconds(200);
-            }
-        } else { // Si on a cliqué dans le panel des boutons
-            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) {
-                int w, h;
-                int panel_middle = game_panel_height + (control_panel_height / 2);
-                // Si l'utilisateur veut quitter
-                MLV_get_size_of_text("Quitter", &w, &h);
-                if ((100 - w/2 <= x && x <= 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
-                    *arret = 1;
-                }
-                // Si l'utilisateur veut recommencer
-                MLV_get_size_of_text("Recommencer", &w, &h);
-                if ((game_panel_width - 100 - w/2 <= x && x <= game_panel_width - 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
-                    re_init(&g, game_panel_width, game_panel_height, control_panel_height);
-                    MLV_update_window();
-                    MLV_wait_milliseconds(200);
-                }
-            }
-        }
-    }
-}
-
-void affiche_t_main(Game g) {
-    int arret = 0; 
-    // On enregistre la fonction de call back
-    MLV_execute_at_exit(stop_affichage, &arret);
-
-    // Création de la fenêtre
-    int game_panel_width = (g.width) * SQUARE_SIZE;
-    int game_panel_height = (g.height) * SQUARE_SIZE;
-    int control_panel_height = 100;
-    MLV_create_window("Minesweeper", "minesweeper", game_panel_width, game_panel_height + control_panel_height);
-    
-    // Affichage des différents "panels" (la grille et les boutons)
-    affiche_lignes(g, game_panel_width, game_panel_height);
-    affiche_control_panel(g, game_panel_width, game_panel_height, control_panel_height);
-    MLV_update_window();
-    
-    // Tant que l'utilisateur ne ferme pas la fenêtre
-    int x, y;
-    do {
-        MLV_get_mouse_position(&x, &y);
-        action(g, game_panel_width, game_panel_height, control_panel_height, x, y, &arret);
-    } while (!arret);
-
-    // on ferme la fenêtre
-    MLV_free_window();
-}
-
-
-// Non graphique
-
-int hasmine_g(Game* g, int x, int y){
+int hasmine_g(Game* g, int x, int y) {
     if ((0 <= x && x < g->width) && (0 <= y && y < g->height)) {
         if (g->terrain[y][x] == 9 || g->terrain[y][x] == -9) {
             return 1;
@@ -342,7 +446,7 @@ int nbmines_g(Game* g, int x, int y) {
     return cpt;
 }
 
-int Pied_g(Game* g, int x, int y){
+int Pied_g(Game* g, int x, int y) {
     if (g->terrain[y][x] == 9) {
         g->terrain[y][x] = 10;
         return 1;
@@ -358,7 +462,7 @@ int Pied_g(Game* g, int x, int y){
     return 0;
 }
 
-void Drapeau_g(Game* g, int x, int y){
+void Drapeau_g(Game* g, int x, int y) {
     if (0 <= x && x < g->width) {
         if (0 <= y && y < g->height) {
             if (g->terrain[y][x] == 9) {
@@ -410,7 +514,7 @@ void init_t(Game* g) {
 int main(int argc, char *argv[]) {
     Game g;
     init_t(&g);
-    affiche_t_main(g);
+    play(g);
     free(g.terrain);
     return 0;
 }
