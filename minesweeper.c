@@ -208,20 +208,26 @@ void stop_affichage(void* data) {
 }
 
 void affiche_lignes(Game g, int game_panel_width, int game_panel_height) {
-    MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height, MLV_COLOR_GRAY);
+    MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height, 
+                             MLV_COLOR_GRAY);
     // les lignes horizontales
     for (int y = 0; y < g.height + 1; y++) {
-        MLV_draw_line(0, y * SQUARE_SIZE, game_panel_width, y * SQUARE_SIZE, MLV_COLOR_BLACK);
+        MLV_draw_line(0, y * SQUARE_SIZE, game_panel_width, y * SQUARE_SIZE,
+                     MLV_COLOR_BLACK);
     }
 
     // les lignes verticales
     for (int x = 0; x < g.width + 1; x++) {
-        MLV_draw_line(x * SQUARE_SIZE, 0, x * SQUARE_SIZE, game_panel_height, MLV_COLOR_BLACK);
+        MLV_draw_line(x * SQUARE_SIZE, 0, x * SQUARE_SIZE, game_panel_height,
+                     MLV_COLOR_BLACK);
     }
 }
 
-void affiche_boutons(Game g, int control_panel_width, int game_panel_height, int control_panel_height) {
-    MLV_draw_filled_rectangle(0, game_panel_height + 1, control_panel_width, game_panel_height + control_panel_height, MLV_COLOR_WHITE);
+void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
+                    int control_panel_height) {
+    MLV_draw_filled_rectangle(0, game_panel_height + 1, control_panel_width,
+                             game_panel_height + control_panel_height,
+                             MLV_COLOR_WHITE);
     int y = game_panel_height + (control_panel_height / 2);
     int w, h;
     MLV_get_size_of_text("Quitter", &w, &h);
@@ -231,14 +237,14 @@ void affiche_boutons(Game g, int control_panel_width, int game_panel_height, int
                  MLV_COLOR_BLACK
                  );
     MLV_get_size_of_text("Nombre de mines : 1", &w, &h);
-    MLV_draw_text(game_panel_width / 2 - w/2,
+    MLV_draw_text(control_panel_width / 2 - w/2,
                  y - h/2,
                  "Nombre de mines : %d",
                  MLV_COLOR_BLACK,
                  g.mines
                  );
     MLV_get_size_of_text("Recommencer", &w, &h);
-    MLV_draw_text(game_panel_width - 100 - w/2,
+    MLV_draw_text(control_panel_width - 100 - w/2,
                  y - h/2,
                  "Recommencer",
                  MLV_COLOR_BLACK,
@@ -260,25 +266,29 @@ void play(Game g) {
     int game_panel_width = (g.width) * SQUARE_SIZE;
     int game_panel_height = (g.height) * SQUARE_SIZE;
     int control_panel_height = 100;
-    MLV_create_window("Minesweeper", "minesweeper", game_panel_width, game_panel_height + control_panel_height);
+    MLV_create_window("Minesweeper", "minesweeper", game_panel_width,
+                     game_panel_height + control_panel_height);
     
     // Affichage des différents "panels" (la grille et les boutons)
     affiche_lignes(g, game_panel_width, game_panel_height);
-    affiche_boutons(g, game_panel_width, game_panel_height, control_panel_height);
+    affiche_boutons(g, game_panel_width, game_panel_height, 
+                   control_panel_height);
     MLV_update_window();
     
     // Tant que l'utilisateur ne ferme pas la fenêtre
     int x, y;
     do {
         MLV_get_mouse_position(&x, &y);
-        action(g, game_panel_width, game_panel_height, control_panel_height, x, y, &arret);
+        action(g, game_panel_width, game_panel_height, control_panel_height, 
+              x, y, &arret);
     } while (!arret);
 
     // on ferme la fenêtre
     MLV_free_window();
 }
 
-void action(Game g, int game_panel_width, int game_panel_height, int control_panel_height, int x, int y, int* arret) {
+void action(Game g, int game_panel_width, int game_panel_height, 
+           int control_panel_height, int x, int y, int* arret) {
     // Si l'utilisateur a cliqué dans la fenêtre
     int window_width = game_panel_width;
     int window_height = game_panel_height + control_panel_height;
@@ -286,8 +296,11 @@ void action(Game g, int game_panel_width, int game_panel_height, int control_pan
         // Si on a cliqué dans le panel de jeu
         if (0 <= y && y < game_panel_height) {
             convert_screen_coords_to_grid_coords(&x, &y);
-            if (perdu(g)) return; // Si le joueur a perdu, il ne peut plus poser de mine ou découvrir des cases
-            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { // clique gauche
+            // Si le joueur a perdu, il ne peut plus poser de mine ou 
+            // découvrir des cases
+            if (perdu(g)) return; 
+            // clique gauche
+            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { 
                 revele_propagation(&g, x, y);
                 MLV_update_window();
             } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
@@ -406,7 +419,7 @@ void re_init(Game* g, int game_panel_width, int game_panel_height, int control_p
     // On réinitialise le plateau
     for (int y = 0; y < g->height; y++) {
         for (int x = 0; x < g->width; x++) {
-            if (g->terrain[y][x] == -9) {
+            if (g->terrain[y][x] == -9 || g->terrain[y][x] == 10) {
                 g->terrain[y][x] = 9;
             } else if (g->terrain[y][x] != 9) {
                 g->terrain[y][x] = 0;
