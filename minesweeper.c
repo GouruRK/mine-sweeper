@@ -491,6 +491,13 @@ void Drapeau_g(Game* g, int x, int y) {
     }
 }
 
+void free_2d_tab(int** tab, int lines) {
+    for (int i = 0; i < lines; i++) {
+        free(tab[i]);
+    }
+    free(tab);
+}
+
 // Initialisation
 
 void init_t(Game* g) {
@@ -507,11 +514,17 @@ void init_t(Game* g) {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
     int** terrain = malloc(g->height * sizeof(int*));
-    if (terrain == NULL) exit(1);
+    if (terrain == NULL) {
+        free(terrain);
+        exit(1);
+    } 
     
     for (int i = 0; i < g->height; i++) {
         int* ligne = calloc(g->width, sizeof(int));
-        if (ligne == NULL) exit(1);
+        if (ligne == NULL) {
+            free_2d_tab(terrain, i-1);
+            exit(1);
+        }
         for (int j = 0; j < g->width; j++) {
             ligne[j] = template[i][j];
         }
@@ -528,6 +541,6 @@ int main(int argc, char *argv[]) {
     Game g;
     init_t(&g);
     play(g);
-    free(g.terrain);
+    free_2d_tab(g.terrain, g.height);
     return 0;
 }
