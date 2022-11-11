@@ -111,8 +111,16 @@ int lecture_param(FILE* fichier) {
 
 void init_tableau(Game* g) {
     int** tab = calloc(g->height, sizeof(int*));
+    if (!tab) {
+        exit(1);
+    }
     for (int i = 0; i < g->height; i++) {
         int* l = calloc(g->width, sizeof(int));
+        if (!l) {
+            free_2d_tab(tab, i-1);
+            free(tab);
+            exit(1);
+        }
         tab[i] = l;
     }
     g->terrain = tab;
@@ -136,6 +144,13 @@ void lecture(Game* g) {
     }
 }
 
+void free_2d_tab(int** tab, int lignes) {
+    for (int i = 0; i < lignes; i++) {
+        free(tab[i]);
+    }
+    free(tab);
+}
+
 /* * * * * * * */
 /*    main     */
 /* * * * * * * */
@@ -144,6 +159,7 @@ int main(int argc, char* argv[]) {
     Game g;
     lecture_arguments(argc, argv, &g);
     lecture(&g);
+    free_2d_tab(g.terrain, g.height);
     // printf("\n");
     // printf("h : %d, l : %d nm : %d\n", g.height, g.width, g.mines);
     return 0;
