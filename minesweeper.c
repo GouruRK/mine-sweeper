@@ -144,6 +144,14 @@ void revele_propagation(Game* g, int x, int y);
 void poser_drapeau(Game* g, int x, int y);
 
 /**
+ * @brief Permet de sauvegarder la grille courrante dans le fichier `save.ga`
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont
+ *          propres
+*/
+void save(Game* g);
+
+/**
  * @brief Permet de savoir si le jeu est perdu. Le jeu est perdu si une 
  *        mine est découverte
  * 
@@ -271,20 +279,27 @@ void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
     int y = game_panel_height + (control_panel_height / 2);
     int w, h;
     MLV_get_size_of_text("Quitter", &w, &h);
-    MLV_draw_text(100 - w/2,
+    MLV_draw_text(control_panel_width * 1/7 - w/2,
                  y - h/2,
                  "Quitter",
                  MLV_COLOR_BLACK
                  );
     MLV_get_size_of_text("Nombre de mines : 1", &w, &h);
-    MLV_draw_text(control_panel_width / 2 - w/2,
+    MLV_draw_text(control_panel_width * 2/5 - w/2,
                  y - h/2,
                  "Nombre de mines : %d",
                  MLV_COLOR_BLACK,
                  g.mines
                  );
+    MLV_get_size_of_text("Sauvegarder", &w, &h);
+    MLV_draw_text(control_panel_width * 3/5 - w/2,
+                 y - h/2,
+                 "Sauvegarder",
+                 MLV_COLOR_BLACK,
+                 g.mines
+                 );
     MLV_get_size_of_text("Recommencer", &w, &h);
-    MLV_draw_text(control_panel_width - 100 - w/2,
+    MLV_draw_text(control_panel_width * 6/7 - w/2,
                  y - h/2,
                  "Recommencer",
                  MLV_COLOR_BLACK,
@@ -382,12 +397,16 @@ void action(Game g, int game_panel_width, int game_panel_height,
                 int panel_middle = game_panel_height + (control_panel_height / 2);
                 // Si l'utilisateur veut quitter
                 MLV_get_size_of_text("Quitter", &w, &h);
-                if ((100 - w/2 <= x && x <= 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                if ((game_panel_width * 1/7 - w/2 <= x && x <= game_panel_width * 1/7 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
                     *arret = 1;
+                }
+                // Si l'utilisateur veut sauvegarder
+                if ((game_panel_width * 3/5 - w/2 <= x && x <= game_panel_width * 3/5 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                    save(&g);
                 }
                 // Si l'utilisateur veut recommencer
                 MLV_get_size_of_text("Recommencer", &w, &h);
-                if ((game_panel_width - 100 - w/2 <= x && x <= game_panel_width - 100 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                if ((game_panel_width * 6/7 - w/2 <= x && x <= game_panel_width * 6/7 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
                     re_init(&g, game_panel_width, game_panel_height, control_panel_height);
                     MLV_update_window();
                     MLV_wait_milliseconds(200);
@@ -474,6 +493,27 @@ void poser_drapeau(Game* g, int x, int y) {
     }
 }
 
+void save(Game* g) {
+    // On ouvre un fichier
+    FILE* f = fopen("save.ga", "w");
+    // Ici, la vérification de l'existence de f est optionnelle : si f
+    // n'existe pas, il est créé
+    fprintf(f, "%d %d %d\n", g->height, g->width, g->mines);
+    for (int y = 0; y < g->height; y++) {
+        for (int x = 0; x < g->width; x++) {
+            if (x == g->width - 1) {
+                fprintf(f, "%d", g->terrain[y][x]);
+            } else {
+                fprintf(f, "%d ", g->terrain[y][x]);
+            }
+        }
+        if (y != g->height - 1) {
+            fprintf(f, "\n");
+        }
+    }
+    fclose(f);
+}
+
 int perdu(Game g) {
     for (int y = 0; y < g.height; y++) {
         for (int x = 0; x < g.width; x++) {
@@ -508,7 +548,6 @@ int victoire_g(Game* g) {
     return nb_drapeau_bien_place == nb_mines 
            || ((g->width * g->height - cases_decouvertes) == nb_mines);
 }
-
 
 void re_init(Game* g, int game_panel_width, int game_panel_height, int control_panel_height) {
     // On réinitialise le plateau
