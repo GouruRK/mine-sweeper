@@ -59,6 +59,23 @@ void affiche_lignes(Game g, int game_panel_width, int game_panel_height);
 void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
         int control_panel_height);
 
+
+/**
+ * @brief Affiche le message "Victoire !" en cas de victoire
+ * 
+ * @param game_panel_width La largeur du panel de jeu
+ * @param game_panel_height La hauteur du panel de jeu
+*/
+void affiche_victoire(int game_panel_width, int game_panel_height);
+
+/**
+ * @brief Affiche le message "Défaite !" en cas de défaite
+ * 
+ * @param game_panel_width La largeur du panel de jeu
+ * @param game_panel_height La hauteur du panel de jeu
+*/
+void affiche_defaite(int game_panel_width, int game_panel_height);
+
 /**
  * @brief Permet de convertir la position de la souris par sa position dans
  *        la grille
@@ -135,6 +152,20 @@ void poser_drapeau(Game* g, int x, int y);
  * @return `1` si c'est perdu, `0` sinon
 */
 int perdu(Game g);
+
+
+/**
+ * @brief Permet de savoir si la partie est gagnée. Les conditions de 
+ *        victoires sont :
+ *          - tous les drapeaux sont bien placés (sur des mines donc)
+ *          - toutes les cases sont découvertes sauf celles des mines
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont
+ *          propres
+ * 
+ * @return `1` si c'est gagné, `0` sinon
+*/
+int victoire_g(Game* g);
 
 /**
  * @brief Permet de réinitialiser la grille, et l'affchage de celle ci
@@ -261,6 +292,30 @@ void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
                  );
 }
 
+void affiche_victoire(int game_panel_width, int game_panel_height) {
+    MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height, MLV_COLOR_WHITE);
+    int w, h;
+    MLV_get_size_of_text("Victoire !", &w, &h);
+    MLV_draw_text(game_panel_width/2 - w/2,
+                 game_panel_height/2 - h/2,
+                 "Victoire !",
+                 MLV_COLOR_GREEN
+                 );
+    MLV_update_window();
+}
+
+void affiche_defaite(int game_panel_width, int game_panel_height) {
+    MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height, MLV_COLOR_WHITE);
+    int w, h;
+    MLV_get_size_of_text("Défaite !", &w, &h);
+    MLV_draw_text(game_panel_width/2 - w/2,
+                 game_panel_height/2 - h/2,
+                 "Défaite !",
+                 MLV_COLOR_RED
+                 );
+    MLV_update_window();
+}
+
 void convert_screen_coords_to_grid_coords(int* x, int* y) {
     *x = *x / SQUARE_SIZE;
     *y = *y / SQUARE_SIZE;
@@ -315,6 +370,11 @@ void action(Game g, int game_panel_width, int game_panel_height,
             } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
                 poser_drapeau(&g, x, y);
                 MLV_wait_milliseconds(200);
+            }
+            if (victoire_g(&g)) {
+                affiche_victoire(game_panel_width, game_panel_height);
+            } else if (perdu(g)) {
+                affiche_defaite(game_panel_width, game_panel_height);
             }
         } else { // Si on a cliqué dans le panel des boutons
             if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) {
@@ -393,7 +453,8 @@ void poser_drapeau(Game* g, int x, int y) {
     int previous = g->terrain[y][x];
     Drapeau_g(g, x, y);
     if (previous != g->terrain[y][x]) {
-        if (g->terrain[y][x] == -9 || g->terrain[y][x] == -10) { // On dessine le drapeau
+        // On dessine le drapeau
+        if (g->terrain[y][x] == -9 || g->terrain[y][x] == -10) {
             MLV_draw_text(
                             x * SQUARE_SIZE + SQUARE_SIZE/2 - 30,
                             y * SQUARE_SIZE + SQUARE_SIZE/2,
@@ -423,6 +484,31 @@ int perdu(Game g) {
     }
     return 0;
 }
+
+int victoire_g(Game* g) {
+    int nb_drapeau_bien_place = 0;
+    int nb_mines = 0;
+    int cases_decouvertes = 0;
+    for (int y = 0; y < g->height; y++) {
+        for (int x = 0; x < g->width; x++) {
+            int case_t = g->terrain[y][x];
+            if (case_t == 9) { // mine
+                nb_mines++;
+            } else if (case_t == -9) { // mine + drapeau bien placé
+                nb_mines++;
+                nb_drapeau_bien_place++;
+            } else if (case_t == -10) { // drapeau mal placé
+                nb_drapeau_bien_place--;
+            } else if (case_t == -11 || (1 <= case_t && case_t <= 8)) {
+                // case découverte sans mine
+                cases_decouvertes++;
+            }
+        }
+    }
+    return nb_drapeau_bien_place == nb_mines 
+           || ((g->width * g->height - cases_decouvertes) == nb_mines);
+}
+
 
 void re_init(Game* g, int game_panel_width, int game_panel_height, int control_panel_height) {
     // On réinitialise le plateau
