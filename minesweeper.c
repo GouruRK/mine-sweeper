@@ -61,7 +61,7 @@ void lecture_arguments(int argc, char* argv[], Game* g) {
                 FILE* f;
                 f = fopen(argv[i], "r");
                 if (f != 0) {  // le fichier existe
-                    fprintf(stderr, "/!\\ 2 fichiers renseignés /!\\\n");
+                    fprintf(stderr, "\x1B[31m" "/!\\ " "\x1B[0m" " 2 fichiers renseignés " "\x1B[31m" "/!\\" "\x1B[0m" "\n");
                     exit(1);
                 }
             } else {
