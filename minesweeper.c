@@ -119,7 +119,6 @@ void ecrire_tableau_random(Game* g, int seed) {
 }
 
 int random_n(int min, int max, int seed) {
-    srand(time(NULL));
     return (rand() % (max - min + 1)) + min;
 }
 
