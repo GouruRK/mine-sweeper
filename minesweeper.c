@@ -308,7 +308,8 @@ void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
 }
 
 void affiche_victoire(int game_panel_width, int game_panel_height) {
-    MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height, MLV_COLOR_WHITE);
+    MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height,
+                             MLV_COLOR_WHITE);
     int w, h;
     MLV_get_size_of_text("Victoire !", &w, &h);
     MLV_draw_text(game_panel_width/2 - w/2,
@@ -320,7 +321,8 @@ void affiche_victoire(int game_panel_width, int game_panel_height) {
 }
 
 void affiche_defaite(int game_panel_width, int game_panel_height) {
-    MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height, MLV_COLOR_WHITE);
+    MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height,
+                             MLV_COLOR_WHITE);
     int w, h;
     MLV_get_size_of_text("Défaite !", &w, &h);
     MLV_draw_text(game_panel_width/2 - w/2,
@@ -358,7 +360,7 @@ void play(Game g) {
     int x, y;
     do {
         MLV_get_mouse_position(&x, &y);
-        action(g, game_panel_width, game_panel_height, control_panel_height, 
+        action(g, game_panel_width, game_panel_height, control_panel_height,
               x, y, &arret);
     } while (!arret);
 
@@ -379,10 +381,12 @@ void action(Game g, int game_panel_width, int game_panel_height,
             // découvrir des cases
             if (perdu(g)) return; 
             // clique gauche
-            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) { 
+            if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == 
+                MLV_PRESSED) { 
                 revele_propagation(&g, x, y);
                 MLV_update_window();
-            } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == MLV_PRESSED) { // clique droit
+            } else if (MLV_get_mouse_button_state(MLV_BUTTON_RIGHT) == 
+                       MLV_PRESSED) { // clique droit
                 poser_drapeau(&g, x, y);
                 MLV_wait_milliseconds(200);
             }
@@ -397,16 +401,25 @@ void action(Game g, int game_panel_width, int game_panel_height,
                 int panel_middle = game_panel_height + (control_panel_height / 2);
                 // Si l'utilisateur veut quitter
                 MLV_get_size_of_text("Quitter", &w, &h);
-                if ((game_panel_width * 1/7 - w/2 <= x && x <= game_panel_width * 1/7 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                if ((game_panel_width * 1/7 - w/2 <= x 
+                     && x <= game_panel_width * 1/7 + w/2) 
+                    && (panel_middle - h/2 <= y 
+                     && y <= panel_middle + h/2)) {
                     *arret = 1;
                 }
                 // Si l'utilisateur veut sauvegarder
-                if ((game_panel_width * 3/5 - w/2 <= x && x <= game_panel_width * 3/5 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                if ((game_panel_width * 3/5 - w/2 <= x
+                     && x <= game_panel_width * 3/5 + w/2) 
+                    && (panel_middle - h/2 <= y 
+                     && y <= panel_middle + h/2)) {
                     save(&g);
                 }
                 // Si l'utilisateur veut recommencer
                 MLV_get_size_of_text("Recommencer", &w, &h);
-                if ((game_panel_width * 6/7 - w/2 <= x && x <= game_panel_width * 6/7 + w/2) && (panel_middle - h/2 <= y && y <= panel_middle + h/2)) {
+                if ((game_panel_width * 6/7 - w/2 <= x 
+                     && x <= game_panel_width * 6/7 + w/2) 
+                    && (panel_middle - h/2 <= y 
+                     && y <= panel_middle + h/2)) {
                     re_init(&g, game_panel_width, game_panel_height, control_panel_height);
                     MLV_update_window();
                     MLV_wait_milliseconds(200);
@@ -420,7 +433,8 @@ void revele_propagation(Game* g, int x, int y) {
     if ((0 <= x && x < g->width) && (0 <= y && y < g->height)) {
         int prev = g->terrain[y][x];
         int explose = Pied_g(g, x, y);
-        if (prev != g->terrain[y][x]) { // Si on a pas encore découvert la case
+        // Si on a pas encore découvert la case
+        if (prev != g->terrain[y][x]) {
             MLV_draw_filled_rectangle(
                                     x * SQUARE_SIZE + 1,
                                     y * SQUARE_SIZE + 1,
@@ -449,7 +463,10 @@ void revele_propagation(Game* g, int x, int y) {
                         {x-1, y-1}
                     };
                     for (int i = 0; i < 8; i++) {
-                        if ((0 <= adjacentes[i][0] && adjacentes[i][0] < g->width) && (0 <= adjacentes[i][1] && adjacentes[i][1] < g->height)) {    
+                        if ((0 <= adjacentes[i][0] 
+                             && adjacentes[i][0] < g->width) 
+                            && (0 <= adjacentes[i][1] 
+                             && adjacentes[i][1] < g->height)) {    
                             if (g->terrain[adjacentes[i][1]][adjacentes[i][0]] == 0) {
                                 revele_propagation(g, adjacentes[i][0], adjacentes[i][1]);
                             }
@@ -549,7 +566,8 @@ int victoire_g(Game* g) {
            || ((g->width * g->height - cases_decouvertes) == nb_mines);
 }
 
-void re_init(Game* g, int game_panel_width, int game_panel_height, int control_panel_height) {
+void re_init(Game* g, int game_panel_width, int game_panel_height, 
+             int control_panel_height) {
     // On réinitialise le plateau
     for (int y = 0; y < g->height; y++) {
         for (int x = 0; x < g->width; x++) {
@@ -562,7 +580,8 @@ void re_init(Game* g, int game_panel_width, int game_panel_height, int control_p
     }
     MLV_clear_window(MLV_COLOR_WHITE);
     affiche_lignes(*g, game_panel_width, game_panel_height);
-    affiche_boutons(*g, game_panel_width, game_panel_height, control_panel_height);
+    affiche_boutons(*g, game_panel_width, game_panel_height, 
+                    control_panel_height);
     MLV_update_window();
 }
 
