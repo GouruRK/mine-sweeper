@@ -198,6 +198,15 @@ int Pied_g(Game* g, int x, int y);
 */
 void Drapeau_g(Game* g, int x, int y);
 
+/**
+ * @brief Libère la mémoire d'un tableau d'entier à deux dimensions sur 
+ *        `lignes` lignes
+ * 
+ * @param tab Le tableau
+ * @param lignes le nombre de lignes
+*/
+void free_2d_tab(int** tab, int lignes);
+
 /* * * * * * * */
 /*  Fonctions */
 /* * * * * * * */
@@ -491,8 +500,8 @@ void Drapeau_g(Game* g, int x, int y) {
     }
 }
 
-void free_2d_tab(int** tab, int lines) {
-    for (int i = 0; i < lines; i++) {
+void free_2d_tab(int** tab, int lignes) {
+    for (int i = 0; i < lignes; i++) {
         free(tab[i]);
     }
     free(tab);
