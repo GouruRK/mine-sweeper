@@ -278,30 +278,30 @@ void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
                              MLV_COLOR_WHITE);
     int y = game_panel_height + (control_panel_height / 2);
     int w, h;
-    MLV_get_size_of_text("Quitter", &w, &h);
-    MLV_draw_text(control_panel_width * 1/7 - w/2,
+    MLV_get_size_of_text("Quit", &w, &h);
+    MLV_draw_text(control_panel_width * 1/5 - w/2,
                  y - h/2,
-                 "Quitter",
+                 "Quit",
                  MLV_COLOR_BLACK
                  );
-    MLV_get_size_of_text("Nombre de mines : 1", &w, &h);
+    MLV_get_size_of_text("Mines : 1", &w, &h);
     MLV_draw_text(control_panel_width * 2/5 - w/2,
                  y - h/2,
-                 "Nombre de mines : %d",
+                 "Mines : %d",
                  MLV_COLOR_BLACK,
                  g.mines
                  );
-    MLV_get_size_of_text("Sauvegarder", &w, &h);
+    MLV_get_size_of_text("Save", &w, &h);
     MLV_draw_text(control_panel_width * 3/5 - w/2,
                  y - h/2,
-                 "Sauvegarder",
+                 "Save",
                  MLV_COLOR_BLACK,
                  g.mines
                  );
-    MLV_get_size_of_text("Recommencer", &w, &h);
-    MLV_draw_text(control_panel_width * 6/7 - w/2,
+    MLV_get_size_of_text("Restart", &w, &h);
+    MLV_draw_text(control_panel_width * 4/5 - w/2,
                  y - h/2,
-                 "Recommencer",
+                 "Restart",
                  MLV_COLOR_BLACK,
                  g.mines
                  );
@@ -401,8 +401,8 @@ void action(Game g, int game_panel_width, int game_panel_height,
                 int panel_middle = game_panel_height + (control_panel_height / 2);
                 // Si l'utilisateur veut quitter
                 MLV_get_size_of_text("Quitter", &w, &h);
-                if ((game_panel_width * 1/7 - w/2 <= x 
-                     && x <= game_panel_width * 1/7 + w/2) 
+                if ((game_panel_width * 1/5 - w/2 <= x 
+                     && x <= game_panel_width * 1/5 + w/2) 
                     && (panel_middle - h/2 <= y 
                      && y <= panel_middle + h/2)) {
                     *arret = 1;
@@ -416,8 +416,8 @@ void action(Game g, int game_panel_width, int game_panel_height,
                 }
                 // Si l'utilisateur veut recommencer
                 MLV_get_size_of_text("Recommencer", &w, &h);
-                if ((game_panel_width * 6/7 - w/2 <= x 
-                     && x <= game_panel_width * 6/7 + w/2) 
+                if ((game_panel_width * 4/5 - w/2 <= x 
+                     && x <= game_panel_width * 4/5 + w/2) 
                     && (panel_middle - h/2 <= y 
                      && y <= panel_middle + h/2)) {
                     re_init(&g, game_panel_width, game_panel_height, control_panel_height);
