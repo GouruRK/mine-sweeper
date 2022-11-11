@@ -29,62 +29,63 @@ void lecture_tableau(FILE* fichier, Game* g);  // supposons fichier bien formé.
 
 void lecture(Game* g);
 
+void free_2d_tab(int** tab, int lignes);
+
 /* * * * * * * */
 /*  Fonctions */
 /* * * * * * * */
 
 void lecture_arguments(int argc, char* argv[], Game* g) {
-    // int fichierOK = 0;
+    int fichierOK = 0;
     if (argv[argc - 1][0] != '-') {  // pas un parametre
         printf("%s\n", argv[argc - 1]);
         FILE* f;
         f = fopen(argv[argc - 1], "r");
         if (f != 0) {  // le fichier existe
-            // fichierOK = 1;
+            fichierOK = 1;
             lecture_fichier(f, g);
             fclose(f);
-            /*
-            } else {
-                f = fopen("mine.ga", "r");
-                if (f != 0) {  // le fichier existe
-                    fichierOK = 1;
-                    lecture_fichier(f, g);
-                    fclose(f);
-                }
-            */
+
+        } else {
+            f = fopen("mine.ga", "r");
+            if (f != 0) {  // le fichier de secours existe
+                fichierOK = 1;
+                lecture_fichier(f, g);
+                fclose(f);
+            }
         }
     }
-    /*
-    for (int i = 1; i < argc - 1; i++) {
-        if (argv[i][0] != '-') {  // pas un parametre
-            FILE* f;
-            f = fopen(argv[i], "r");
-            if (f != 0) {  // le fichier existe
-                fprintf(stderr, "/!\\ 2 fichiers renseignés /!\\\n");
-                exit(1);
-            }
-        } else {
-            printf("%c\n", argv[i][1]);
-            printf("%s\n", argv[i + 1]);
-            printf("%s\n", argv[i + 2]);
-            printf("%s\n", argv[i + 3]);
-
-            if (argv[i][1] == 'j') {
-                printf("%d", i);
-                int h = atoi(argv[i + 1]), l = atoi(argv[i + 2]), m = atoi(argv[i + 3]);
-                if (m >= l * h) {
-                    fprintf(stderr, "Trop de mines\n");
+    if (fichierOK == 0) {
+        for (int i = 1; i < argc - 1; i++) {
+            if (argv[i][0] != '-') {  // pas un parametre
+                FILE* f;
+                f = fopen(argv[i], "r");
+                if (f != 0) {  // le fichier existe
+                    fprintf(stderr, "/!\\ 2 fichiers renseignés /!\\\n");
                     exit(1);
                 }
-                g->height = atoi(argv[i + 1]);
-                g->width = atoi(argv[i + 2]);
-                g->mines = atoi(argv[i + 3]);
-                i += 3;
-                printf("%d", i);
+            } else {
+                printf("%c\n", argv[i][1]);
+                printf("%s\n", argv[i + 1]);
+                printf("%s\n", argv[i + 2]);
+                printf("%s\n", argv[i + 3]);
+
+                if (argv[i][1] == 'j') {
+                    printf("%d", i);
+                    int h = atoi(argv[i + 1]), l = atoi(argv[i + 2]), m = atoi(argv[i + 3]);
+                    if (m >= l * h) {
+                        fprintf(stderr, "Trop de mines\n");
+                        exit(1);
+                    }
+                    g->height = atoi(argv[i + 1]);
+                    g->width = atoi(argv[i + 2]);
+                    g->mines = atoi(argv[i + 3]);
+                    i += 3;
+                    printf("%d", i);
+                }
             }
         }
     }
-    */
 }
 
 void lecture_fichier(FILE* fichier, Game* g) {
@@ -117,14 +118,13 @@ void init_tableau(Game* g) {
     for (int i = 0; i < g->height; i++) {
         int* l = calloc(g->width, sizeof(int));
         if (!l) {
-            free_2d_tab(tab, i-1);
+            free_2d_tab(tab, i - 1);
             free(tab);
             exit(1);
         }
         tab[i] = l;
     }
     g->terrain = tab;
-    lecture(g);
 }
 
 void lecture_tableau(FILE* fichier, Game* g) {
