@@ -30,7 +30,7 @@ void init_tableau(Game* g);  // avec que des 0
 
 void ecrire_tableau(FILE* fichier, Game* g);  // supposons fichier bien formé.
 
-void ecrire_tableau_random(Game* g, int seed);
+void ecrire_tableau_random(Game* g);
 
 void lecture_arg_j(int i, char* argv[], Game* g);
 
@@ -38,7 +38,7 @@ void lecture(Game* g);
 
 void free_2d_tab(int** tab, int lignes);
 
-int random_n(int min, int max, int seed);
+int random_n(int min, int max);
 
 /* * * * * * * */
 /*  Fonctions */
@@ -91,7 +91,8 @@ void init_jeu_avec_param(int argc, char* argv[], Game* g) {
         }
     }
     init_tableau(g);
-    ecrire_tableau_random(g, seed);
+    srand(seed);
+    ecrire_tableau_random(g);
 }
 
 void lecture_arg_j(int i, char* argv[], Game* g) {
@@ -105,11 +106,11 @@ void lecture_arg_j(int i, char* argv[], Game* g) {
     g->mines = atoi(argv[i + 3]);
 }
 
-void ecrire_tableau_random(Game* g, int seed) {
+void ecrire_tableau_random(Game* g) {
     int acc = 0, i = 0, j = 0;
     while (acc != g->mines) {
-        i = random_n(0, (g->height) - 1, seed);
-        j = random_n(0, (g->width) - 1, seed);
+        i = random_n(0, (g->height) - 1);
+        j = random_n(0, (g->width) - 1);
         printf("i=%d j=%d\n", i, j);
         if (g->terrain[i][j] == 0) {
             g->terrain[i][j] = 9;
@@ -118,7 +119,7 @@ void ecrire_tableau_random(Game* g, int seed) {
     }
 }
 
-int random_n(int min, int max, int seed) {
+int random_n(int min, int max) {
     return (rand() % (max - min + 1)) + min;
 }
 
