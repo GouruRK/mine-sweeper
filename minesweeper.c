@@ -91,8 +91,6 @@ void ecrire_tableau_random(Game* g);
  */
 void lecture_arg_j(int i, char* argv[], Game* g);
 
-void lecture(Game* g);
-
 /**
  * @brief Permet liberer la mémoire utliser par tableau sur tas.
  *
@@ -146,6 +144,14 @@ void affiche_lignes(Game g, int game_panel_width, int game_panel_height,
 void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
         int control_panel_height);
 
+/**
+ * @brief Affiche l'actuel status d'une grille
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param taille_case La taille des cases
+*/
+void affiche_grille(Game g, int taille_case);
 
 /**
  * @brief Affiche le message "Victoire !" en cas de victoire
@@ -233,6 +239,34 @@ void revele_propagation(Game* g, int x, int y, int taille_case);
  * @param taille_case La taille des cases du jeu
 */
 void poser_drapeau(Game* g, int x, int y, int taille_case);
+
+/**
+ * @brief Dessine un drapeau
+ * 
+ * @param x La position en x de la case où dessiner le drapeau
+ * @param x La position en y de la case où dessiner le drapeau
+ * @param taille_case La taille des cases
+*/
+void dessine_drapeau(int x, int y, int taille_case);
+
+/**
+ * @brief Change la couleur d'une case pour signifier qu'elle est découverte
+ * 
+ * @param x La position en x de la case à révéler
+ * @param y La position en y de la case à révéler
+ * @param taille_case La taille des cases
+*/
+void dessine_case_revelee(int x, int y, int taille_case);
+
+/**
+ * @brief Permet de d'afficher un nombre sur une case
+ * 
+ * @param x La position en x de la case à révéler
+ * @param y La position en y de la case à révéler
+ * @param taille_case La taille des cases
+ * @param nb Le nombre a afficher
+*/
+void dessine_nombre(int x, int y, int taille_case, int nb);
 
 /**
  * @brief Permet de sauvegarder la grille courrante dans le fichier `save.ga`
@@ -391,7 +425,6 @@ void ecrire_tableau_random(Game* g) {
     while (acc != g->mines) {
         i = random_n(0, (g->height) - 1);
         j = random_n(0, (g->width) - 1);
-        printf("i=%d j=%d\n", i, j);
         if (g->terrain[i][j] == 0) {
             g->terrain[i][j] = 9;
             acc++;
@@ -418,8 +451,8 @@ int lecture_param(FILE* fichier) {
     do {
         c = fgetc(fichier);
         if (c != ' ' && c != '\n') {
-            val = val * 10 + strtol(&c, &endPtr, 10);  // converti char en entier(evite etape par ascii)
-            // printf("val*puiss=%d val=%d\n",val*10,val);
+            // converti char en entier(evite etape par ascii)
+            val = val * 10 + strtol(&c, &endPtr, 10);
         }
     } while (c != EOF && c != ' ' && c != '\n');
     return val;
@@ -447,15 +480,6 @@ void ecrire_tableau(FILE* fichier, Game* g) {
         for (int j = 0; j < g->width; j++) {
             fscanf(fichier, "%d", &(g->terrain[i][j]));
         }
-    }
-}
-
-void lecture(Game* g) {
-    for (int i = 0; i < g->height; i++) {
-        for (int j = 0; j < g->width; j++) {
-            printf("%d ", g->terrain[i][j]);
-        }
-        printf("\n");
     }
 }
 
@@ -524,6 +548,21 @@ void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
                  );
 }
 
+void affiche_grille(Game g, int taille_case) {
+    for (int y = 0; y < g.height; y++) {
+        for (int x = 0; x < g.width; x++) {
+            if (g.terrain[y][x] == -11) {
+                dessine_case_revelee(x, y, taille_case);
+            } else if (g.terrain[y][x] == -9 || g.terrain[y][x] == -10) {
+                dessine_drapeau(x, y, taille_case);
+            } else if (1 <= g.terrain[y][x] && g.terrain[y][x] <= 8) {
+                dessine_case_revelee(x, y, taille_case);
+                dessine_nombre(x, y, taille_case, g.terrain[y][x]);
+            }
+        }
+    }
+}
+
 void affiche_victoire(int game_panel_width, int game_panel_height) {
     MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height,
                              MLV_COLOR_WHITE);
@@ -587,6 +626,7 @@ void play(Game g) {
     affiche_lignes(g, game_panel_width, game_panel_height, taille_case);
     affiche_boutons(g, game_panel_width, game_panel_height, 
                    control_panel_height);
+    affiche_grille(g, taille_case);
     MLV_update_window();
     
     // Tant que l'utilisateur ne ferme pas la fenêtre
@@ -670,22 +710,10 @@ void revele_propagation(Game* g, int x, int y, int taille_case) {
         int explose = Pied_g(g, x, y);
         // Si on a pas encore découvert la case
         if (prev != g->terrain[y][x]) {
-            MLV_draw_filled_rectangle(
-                                    x * taille_case + 1,
-                                    y * taille_case + 1,
-                                    taille_case-1,
-                                    taille_case-1,
-                                    MLV_COLOR_WHITE
-                                    );
+            dessine_case_revelee(x, y, taille_case);
             if (!explose) { // si on explose pas
                 if (g->terrain[y][x] != -11) {
-                    MLV_draw_text(
-                                 x * taille_case + taille_case/2,
-                                 y * taille_case + taille_case/2,
-                                 "%d",
-                                 MLV_COLOR_BLACK,
-                                 g->terrain[y][x]
-                                 );
+                    dessine_nombre(x, y, taille_case, g->terrain[y][x]);
                 } else if (g->terrain[y][x] == -11) {
                     int adjacentes[8][2] = {
                         {x+1, y},
@@ -703,18 +731,13 @@ void revele_propagation(Game* g, int x, int y, int taille_case) {
                             && (0 <= adjacentes[i][1] 
                              && adjacentes[i][1] < g->height)) {    
                             if (g->terrain[adjacentes[i][1]][adjacentes[i][0]] == 0) {
-                                revele_propagation(g, adjacentes[i][0], adjacentes[i][1], taille_case);
+                                revele_propagation(g, adjacentes[i][0], 
+                                                  adjacentes[i][1],
+                                                  taille_case);
                             }
                         }
                     }
                 }
-            } else {
-                MLV_draw_text(
-                             x * taille_case + taille_case/2 - 20,
-                             y * taille_case + taille_case/2,
-                             "Boom !",
-                             MLV_COLOR_BLACK
-                             );
             }
         }
     }
@@ -726,17 +749,7 @@ void poser_drapeau(Game* g, int x, int y, int taille_case) {
     if (previous != g->terrain[y][x]) {
         // On dessine le drapeau
         if (g->terrain[y][x] == -9 || g->terrain[y][x] == -10) {
-            int xx[3] = {
-                x * taille_case + taille_case/4,
-                x * taille_case + taille_case*3/4,
-                x * taille_case + taille_case/4,
-            };
-            int yy[3] = {
-                y * taille_case + taille_case*1/4,
-                y * taille_case + taille_case/2,
-                y * taille_case + taille_case*3/4,
-            };
-            MLV_draw_filled_polygon(xx, yy, 3, MLV_COLOR_RED);
+            dessine_drapeau(x, y, taille_case);
         } else { // on enlève le drapeau
             MLV_draw_filled_rectangle(
                                         x * taille_case + 1,
@@ -748,6 +761,40 @@ void poser_drapeau(Game* g, int x, int y, int taille_case) {
         }
         MLV_update_window();
     }
+}
+
+void dessine_drapeau(int x, int y, int taille_case) {
+    int xx[3] = {
+        x * taille_case + taille_case/4,
+        x * taille_case + taille_case*3/4,
+        x * taille_case + taille_case/4,
+    };
+    int yy[3] = {
+        y * taille_case + taille_case*1/4,
+        y * taille_case + taille_case/2,
+        y * taille_case + taille_case*3/4,
+    };
+    MLV_draw_filled_polygon(xx, yy, 3, MLV_COLOR_RED);
+}
+
+void dessine_case_revelee(int x, int y, int taille_case) {
+    MLV_draw_filled_rectangle(
+                            x * taille_case + 1,
+                            y * taille_case + 1,
+                            taille_case-1,
+                            taille_case-1,
+                            MLV_COLOR_WHITE
+                            );
+}
+
+void dessine_nombre(int x, int y, int taille_case, int nb) {
+    MLV_draw_text(
+                 x * taille_case + taille_case/2,
+                 y * taille_case + taille_case/2,
+                 "%d",
+                 MLV_COLOR_BLACK,
+                 nb
+                 );
 }
 
 void save(Game* g) {
@@ -891,10 +938,7 @@ void Drapeau_g(Game* g, int x, int y) {
 int main(int argc, char* argv[]) {
     Game g;
     init_jeu(argc, argv, &g);
-    lecture(&g);
     play(g);
     free_2d_tab(g.terrain, g.height);
-    printf("\n");
-    printf("h : %d, l : %d nm : %d\n", g.height, g.width, g.mines);
     return 0;
 }
