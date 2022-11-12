@@ -345,14 +345,6 @@ void init_jeu(int argc, char* argv[], Game* g) {
             fichierOK = 1;
             lecture_fichier(f, g);
             fclose(f);
-
-        } else {
-            f = fopen("mines.ga", "r");
-            if (f != 0) {  // le fichier de secours existe
-                fichierOK = 1;
-                lecture_fichier(f, g);
-                fclose(f);
-            }
         }
     }
     if (fichierOK == 0) {
