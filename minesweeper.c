@@ -117,7 +117,8 @@ void init_jeu(int argc, char* argv[], Game* g) {
     if (argv[argc - 1][0] != '-') {  // pas un parametre
         FILE* f;
         f = fopen(argv[argc - 1], "r");
-        if (f != 0) {  // le fichier existe
+        if (f != 0 && (argc - 1 == 1)) {  // le fichier existe
+            printf("Les pbs");
             fichierOK = 1;
             lecture_fichier(f, g);
             fclose(f);
@@ -132,6 +133,7 @@ void init_jeu(int argc, char* argv[], Game* g) {
         }
     }
     if (fichierOK == 0) {
+        printf("Il est passer par ici");
         init_jeu_avec_param(argc, argv, g);
     }
 }
@@ -158,6 +160,7 @@ void init_jeu_avec_param(int argc, char* argv[], Game* g) {
             }
         }
     }
+    printf("J'espere qu il passe par la");
     init_tableau(g);
     srand(seed);
     ecrire_tableau_random(g);
