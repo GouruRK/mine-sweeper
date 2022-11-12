@@ -115,6 +115,10 @@ void free_2d_tab(int** tab, int lignes);
  */
 int random_n(int min, int max);
 
+
+// -----------------------------------------
+
+
 /**
  * @brief Enregistrement de la fonction de call back pour la lib MLV
  *        lors de la fermeture de la fenêtre
@@ -122,7 +126,6 @@ int random_n(int min, int max);
  * @param data 
 */
 void stop_affichage(void* data);
-
 
 /**
  * @brief Permet d'afficher les lignes sur la fenêtre représentant la grille
@@ -329,15 +332,6 @@ int Pied_g(Game* g, int x, int y);
 */
 void Drapeau_g(Game* g, int x, int y);
 
-/**
- * @brief Libère la mémoire d'un tableau d'entier à deux dimensions sur 
- *        `lignes` lignes
- * 
- * @param tab Le tableau
- * @param lignes le nombre de lignes
-*/
-void free_2d_tab(int** tab, int lignes);
-
 /* * * * * * * */
 /*  Fonctions */
 /* * * * * * * */
@@ -353,7 +347,7 @@ void init_jeu(int argc, char* argv[], Game* g) {
             fclose(f);
 
         } else {
-            f = fopen("mine.ga", "r");
+            f = fopen("mines.ga", "r");
             if (f != 0) {  // le fichier de secours existe
                 fichierOK = 1;
                 lecture_fichier(f, g);
@@ -474,6 +468,19 @@ void lecture(Game* g) {
             printf("%d ", g->terrain[i][j]);
         }
         printf("\n");
+    }
+}
+
+void free_2d_tab(int** tab, int lignes) {
+    for (int i = 0; i < lignes; i++) {
+        free(tab[i]);
+    }
+    free(tab);
+}
+
+
+// ---------------------------------------
+
 void stop_affichage(void* data) {
 	int* arret = (int*) data;
 	*arret = 1;
@@ -868,13 +875,6 @@ void Drapeau_g(Game* g, int x, int y) {
     }
 }
 
-void free_2d_tab(int** tab, int lignes) {
-    for (int i = 0; i < lignes; i++) {
-        free(tab[i]);
-    }
-    free(tab);
-}
-
 /* * * * * * * */
 /*    main     */
 /* * * * * * * */
@@ -883,6 +883,7 @@ int main(int argc, char* argv[]) {
     Game g;
     init_jeu(argc, argv, &g);
     lecture(&g);
+    play(g);
     free_2d_tab(g.terrain, g.height);
     printf("\n");
     printf("h : %d, l : %d nm : %d\n", g.height, g.width, g.mines);
