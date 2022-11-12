@@ -18,26 +18,94 @@ typedef struct _game {
 /*  Prototypes */
 /* * * * * * * */
 
+/**
+ * @brief Permet d'initialiser le plateau de jeu dans tous les cas posssible.
+ *
+ * @param argc Le nombre d'arguements.
+ * @param argv Le tableau contenant les arguments.
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void init_jeu(int argc, char* argv[], Game* g);
 
+/**
+ * @brief Permet d'initialiser le plateau de jeu si le fichier est invalides.
+ *
+ * @param argc Le nombre d'arguements.
+ * @param argv Le tableau contenant les arguments.
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void init_jeu_avec_param(int argc, char* argv[], Game* g);
 
+/**
+ * @brief Permet de lire le fichier si il est bien formé.
+ *
+ * @param fichier Fichier contenant le jeu.
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void lecture_fichier(FILE* fichier, Game* g);
 
+/**
+ * @brief Permet de lire 1 nombre du fichier voulu.
+ *
+ * @param fichier Fichier contenant le jeu.
+ */
 int lecture_param(FILE* fichier);
 
-void init_tableau(Game* g);  // avec que des 0
+/**
+ * @brief Crée un tableau composé de 0 dans chaque case à partir de
+ *          g->height et g->width et l'initialise dans g->tableau.
+ *
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
+void init_tableau(Game* g);
 
-void ecrire_tableau(FILE* fichier, Game* g);  // supposons fichier bien formé.
+/**
+ * @brief Permet de mettre les valeurs du fichier dans le tableau.
+ *
+ * @param fichier Fichier contenant le jeu.
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
+void ecrire_tableau(FILE* fichier, Game* g);
 
+/**
+ * @brief Permet de mettre des mines aléatoirement dans un tableau composé.
+ *
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void ecrire_tableau_random(Game* g);
 
+/**
+ * @brief Permet de mettre des mines aléatoirement dans un tableau composé.
+ *
+ * @param i Indice de la position de l'arguement -j dans argv.
+ * @param argv Le tableau contenant les arguments.
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void lecture_arg_j(int i, char* argv[], Game* g);
 
 void lecture(Game* g);
 
+/**
+ * @brief Permet liberer la mémoire utliser par tableau sur tas.
+ *
+ * @param tab tableau contenant des adresses de tableaux.
+ * @param lignes nombre de ligne du tableau.
+ */
 void free_2d_tab(int** tab, int lignes);
 
+/**
+ * @brief Permet de générer un nombre aléatoire entre min et max (inclu).
+ *
+ * @param min nombre minimum pouvant etre generé.
+ * @param max nombre maximum pouvant etre generé.
+ */
 int random_n(int min, int max);
 
 /* * * * * * * */
