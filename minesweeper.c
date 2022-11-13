@@ -664,10 +664,10 @@ void action(Game g, int game_panel_width, int game_panel_height,
                 poser_drapeau(&g, x, y, taille_case);
                 MLV_wait_milliseconds(400);
             }
-            if (victoire_g(&g)) {
-                affiche_victoire(game_panel_width, game_panel_height);
-            } else if (perdu(g)) {
+            if (perdu(g)) {
                 affiche_defaite(game_panel_width, game_panel_height);
+            } else if (victoire_g(&g)) {
+                affiche_victoire(game_panel_width, game_panel_height);
             }
         } else { // Si on a cliqué dans le panel des boutons
             if (MLV_get_mouse_button_state(MLV_BUTTON_LEFT) == MLV_PRESSED) {
@@ -788,11 +788,40 @@ void dessine_case_revelee(int x, int y, int taille_case) {
 }
 
 void dessine_nombre(int x, int y, int taille_case, int nb) {
+    MLV_Color couleur;
+    switch (nb) {
+        case 1:
+            couleur = MLV_COLOR_BLUE;
+            break;
+        case 2:
+            couleur = MLV_COLOR_GREEN;
+            break;
+        case 3:
+            couleur = MLV_COLOR_RED;
+            break;
+        case 4:
+            couleur = MLV_COLOR_PURPLE;
+            break;
+        case 5:
+            couleur = MLV_COLOR_MAROON;
+            break;
+        case 6:
+            couleur = MLV_COLOR_TURQUOISE;
+            break;
+        case 7:
+            couleur = MLV_COLOR_BLACK;
+            break;
+        case 8:
+            couleur = MLV_COLOR_GRAY;
+            break;
+        default:
+            break;
+    }
     MLV_draw_text(
                  x * taille_case + taille_case/2,
                  y * taille_case + taille_case/2,
                  "%d",
-                 MLV_COLOR_BLACK,
+                 couleur,
                  nb
                  );
 }
