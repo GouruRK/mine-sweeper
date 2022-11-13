@@ -19,6 +19,9 @@ typedef struct _game {
 /*  Prototypes */
 /* * * * * * * */
 
+
+// Lecture de fichiers + args
+
 /**
  * @brief Permet d'initialiser le plateau de jeu dans tous les cas posssible.
  *
@@ -106,6 +109,8 @@ void free_2d_tab(int** tab, int lignes);
  * @param max nombre maximum pouvant etre generé.
  */
 int random_n(int min, int max);
+
+// Fonctions graphiques
 
 /**
  * @brief Enregistrement de la fonction de call back pour la lib MLV
@@ -276,6 +281,8 @@ void dessine_nombre(int x, int y, int taille_case, int nb);
 */
 void save(Game* g);
 
+// Fonctions gestions du jeu
+
 /**
  * @brief Permet de savoir si le jeu est perdu. Le jeu est perdu si une 
  *        mine est découverte
@@ -366,6 +373,8 @@ void Drapeau_g(Game* g, int x, int y);
 /*  Fonctions */
 /* * * * * * * */
 
+// Lecture de fichiers + args
+
 void init_jeu(int argc, char* argv[], Game* g) {
     int fichierOK = 0;
     if (argv[argc - 1][0] != '-') {  // pas un parametre
@@ -412,7 +421,7 @@ void init_jeu_avec_param(int argc, char* argv[], Game* g) {
 void lecture_arg_j(int i, char* argv[], Game* g) {
     int h = atoi(argv[i + 1]), l = atoi(argv[i + 2]), m = atoi(argv[i + 3]);
     if (m >= l * h) {
-        fprintf(stderr, "\x1B[31m/!\\ \x1B[0m Plus de mine que de case \x1B[31m /!\\ \x1B[0m \n");
+        fprintf(stderr, "\x1B[31m/!\\ \x1B[0m Plus de mines que de cases \x1B[31m /!\\ \x1B[0m \n");
         exit(2);
     }
     g->height = atoi(argv[i + 1]);
@@ -461,14 +470,16 @@ int lecture_param(FILE* fichier) {
 void init_tableau(Game* g) {
     int** tab = calloc(g->height, sizeof(int*));
     if (!tab) {
-        exit(1);
+        fprintf(stderr, "\x1B[31m/!\\ \x1B[0m Impossible d'allouer la mémoire demandée \x1B[31m /!\\ \x1B[0m \n");
+        exit(3);
     }
     for (int i = 0; i < g->height; i++) {
         int* l = calloc(g->width, sizeof(int));
         if (!l) {
             free_2d_tab(tab, i - 1);
             free(tab);
-            exit(1);
+            fprintf(stderr, "\x1B[31m/!\\ \x1B[0m Impossible d'allouer la mémoire demandée \x1B[31m /!\\ \x1B[0m \n");
+            exit(3);
         }
         tab[i] = l;
     }
@@ -489,6 +500,8 @@ void free_2d_tab(int** tab, int lignes) {
     }
     free(tab);
 }
+
+// Fonctions graphiques
 
 void stop_affichage(void* data) {
 	int* arret = (int*) data;
@@ -846,6 +859,8 @@ void save(Game* g) {
     }
     fclose(f);
 }
+
+// Fonctions gestions du jeu
 
 int perdu(Game g) {
     for (int y = 0; y < g.height; y++) {
