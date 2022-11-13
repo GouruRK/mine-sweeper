@@ -801,7 +801,7 @@ void dessine_case_revelee(int x, int y, int taille_case) {
 }
 
 void dessine_nombre(int x, int y, int taille_case, int nb) {
-    MLV_Color couleur;
+    MLV_Color couleur = MLV_COLOR_WHITE;
     switch (nb) {
         case 1:
             couleur = MLV_COLOR_BLUE;
@@ -828,7 +828,7 @@ void dessine_nombre(int x, int y, int taille_case, int nb) {
             couleur = MLV_COLOR_GRAY;
             break;
         default:
-            break;
+            return;
     }
     MLV_draw_text(
                  x * taille_case + taille_case/2,
