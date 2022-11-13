@@ -371,7 +371,7 @@ void init_jeu(int argc, char* argv[], Game* g) {
     if (argv[argc - 1][0] != '-') {  // pas un parametre
         FILE* f;
         f = fopen(argv[argc - 1], "r");
-        if (f != 0 && (argc - 1 == 1)) {  // le fichier existe
+        if (f != 0 && (argc - 1 != 0)) {  // le fichier existe
             fichierOK = 1;
             lecture_fichier(f, g);
             fclose(f);
@@ -390,7 +390,7 @@ void init_jeu_avec_param(int argc, char* argv[], Game* g) {
             FILE* f;
             f = fopen(argv[i], "r");
             if (f != 0) {  // le fichier existe
-                fprintf(stderr, "\x1B[31m /!\\ \x1B[0m 2 fichiers renseignés \x1B[31m /!\\ \x1B[0m \n");
+                fprintf(stderr, "\x1B[31m /!\\ \x1B[0m 2 paramètres renseignés au mauvais endroit \x1B[31m /!\\ \x1B[0m \n");
                 exit(1);
             }
         } else {
