@@ -1,24 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <MLV/MLV_all.h>
+#include "main.h"
 
 /* * * * * * * */
 /*  Structures */
 /* * * * * * * */
-
-typedef struct _game {
-    int width;
-    int height;
-    int mines;
-    int** terrain;
-    int termine;
-} Game;
-
-/* * * * * * * */
-/*  Prototypes */
-/* * * * * * * */
-
 
 // Lecture de fichiers + args
 
@@ -30,351 +14,6 @@ typedef struct _game {
  * @param g Structure représentant la grille et les données qui lui sont
  *         propres.
  */
-void init_jeu(int argc, char* argv[], Game* g);
-
-/**
- * @brief Permet d'initialiser le plateau de jeu si le fichier est invalides.
- *
- * @param argc Le nombre d'arguements.
- * @param argv Le tableau contenant les arguments.
- * @param g Structure représentant la grille et les données qui lui sont
- *         propres.
- */
-void init_jeu_avec_param(int argc, char* argv[], Game* g);
-
-/**
- * @brief Permet de lire le fichier si il est bien formé.
- *
- * @param fichier Fichier contenant le jeu.
- * @param g Structure représentant la grille et les données qui lui sont
- *         propres.
- */
-void lecture_fichier(FILE* fichier, Game* g);
-
-/**
- * @brief Permet de lire 1 nombre du fichier voulu.
- *
- * @param fichier Fichier contenant le jeu.
- */
-int lecture_param(FILE* fichier);
-
-/**
- * @brief Crée un tableau composé de 0 dans chaque case à partir de
- *          g->height et g->width et l'initialise dans g->tableau.
- *
- * @param g Structure représentant la grille et les données qui lui sont
- *         propres.
- */
-void init_tableau(Game* g);
-
-/**
- * @brief Permet de mettre les valeurs du fichier dans le tableau.
- *
- * @param fichier Fichier contenant le jeu.
- * @param g Structure représentant la grille et les données qui lui sont
- *         propres.
- */
-void ecrire_tableau(FILE* fichier, Game* g);
-
-/**
- * @brief Permet de mettre des mines aléatoirement dans un tableau composé.
- *
- * @param g Structure représentant la grille et les données qui lui sont
- *         propres.
- */
-void ecrire_tableau_random(Game* g);
-
-/**
- * @brief Permet de mettre des mines aléatoirement dans un tableau composé.
- *
- * @param i Indice de la position de l'arguement -j dans argv.
- * @param argv Le tableau contenant les arguments.
- * @param g Structure représentant la grille et les données qui lui sont
- *         propres.
- */
-void lecture_arg_j(int i, char* argv[], Game* g);
-
-/**
- * @brief Permet liberer la mémoire utliser par tableau sur tas.
- *
- * @param tab tableau contenant des adresses de tableaux.
- * @param lignes nombre de ligne du tableau.
- */
-void free_2d_tab(int** tab, int lignes);
-
-/**
- * @brief Permet de générer un nombre aléatoire entre min et max (inclu).
- *
- * @param min nombre minimum pouvant etre generé.
- * @param max nombre maximum pouvant etre generé.
- */
-int random_n(int min, int max);
-
-// Fonctions graphiques
-
-/**
- * @brief Enregistrement de la fonction de call back pour la lib MLV
- *        lors de la fermeture de la fenêtre
- * 
- * @param data 
-*/
-void stop_affichage(void* data);
-
-/**
- * @brief Permet d'afficher les lignes sur la fenêtre représentant la grille
- *        de jeu
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param game_panel_width La largeur de la grille de jeu
- * @param game_panel_height La hauteur de la grille de jeu
- * @param taille_case La taille des cases du jeu
-*/
-void affiche_lignes(Game g, int game_panel_width, int game_panel_height,
-        int taille_case);
-
-/**
- * @brief Affiche les boutons permettant d'interagir avec le programme
- *        pour quitter ou recommencer une partie
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param control_panel_width La largeur du panel avec les boutons
- * @param game_panel_height La hauteur du panel de jeu avec la grille 
- *        représentée. Cette donnée est important car le panel avec les
- *        boutons se trouvant en dessous de la grille de jeu, il se trouve
- *        alors a y = game_panel_height
- * @param control_panel_height La hauteur du panel avec les boutons
-*/
-void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
-        int control_panel_height);
-
-/**
- * @brief Affiche l'actuel status d'une grille
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param taille_case La taille des cases
-*/
-void affiche_grille(Game g, int taille_case);
-
-/**
- * @brief Affiche le message "Victoire !" en cas de victoire
- * 
- * @param game_panel_width La largeur du panel de jeu
- * @param game_panel_height La hauteur du panel de jeu
-*/
-void affiche_victoire(int game_panel_width, int game_panel_height);
-
-/**
- * @brief Affiche le message "Défaite !" en cas de défaite
- * 
- * @param game_panel_width La largeur du panel de jeu
- * @param game_panel_height La hauteur du panel de jeu
-*/
-void affiche_defaite(int game_panel_width, int game_panel_height);
-
-/**
- * @brief Permet de convertir la position de la souris par sa position dans
- *        la grille
- * 
- * @param x La position en x de la souris, qui est modifié pour prendre la 
- *          valeur en x dans le tableau
- * @param y La position en y de la souris, qui est modifié pour prendre la 
- *          valeur en y dans le tableau
- * @param taille_case La taille des cases du jeu
-*/
-void convert_screen_coords_to_grid_coords(int* x, int* y, int taille_case);
-
-/**
- * @brief Fonction qui permet d'afficher la fenêtre et d'interagir avec
- *        l'utilisateur. Elle est également responsable de gérer la 
- *        fermeture de la fenêtre
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
-*/
-void play(Game g);
-
-/**
- * @brief Fonction permettant de déterminer les actions de l'utilisateur et
- *        d'agir en conséquence. Les interactions possibles de l'utilisateurs
- *        sont des clics gauche ou droit.
- *        Les actions possibles sont :
- *         - Fermeture du jeu (par la "x" de la fenêtre ou en cliquant sur
- *           le bouton "Quitter") ;
- *         - Recommencer la partie (en cliquant sur le bouton "Recommencer");
- *         - Découvrir une case (en faisant un clique gauche sur la grille);
- *         - Déposer un drapeau (en faisant un clique droit sur la grille)
- *
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param game_panel_width La largeur du panel de jeu
- * @param game_panel_height La hauteur du panel de jeu
- * @param control_panel_height La hauteur du panel des boutons
- * @param x La position en x de la souris
- * @param y La position en y de la souris
- * @param taille_case La taille des cases du jeu
- * @param arret Argument modifié à `1` si l'utilisateur souhaite quitter 
- *        la partie
-*/
-void action(Game g, int game_panel_width, int game_panel_height,
-        int control_panel_height, int x, int y, int taille_case, int* arret);
-
-/**
- * @brief Fonction permettant de découvrir une case. Si la case n'est pas une
- *        mine ou n'est pas adjacente à une mine, elle révèle les cases 
- *        adjacentes etc. Modifie l'aspect graphique de la grille
- *
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param x La position en x de la case a révéler
- * @param y La position en y de la case a révéler
- * @param taille_case La taille des cases du jeu
-*/
-void revele_propagation(Game* g, int x, int y, int taille_case);
-
-/** @brief Permet de poser un drapeau. Si un drapeau est déjà présent,
- *        le drapeau est retiré. Modifie l'aspect graphique de la grille
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param x La position en x de la case où poser le drapeau
- * @param y La position en y de la case où poser le drapeau
- * @param taille_case La taille des cases du jeu
-*/
-void poser_drapeau(Game* g, int x, int y, int taille_case);
-
-/**
- * @brief Dessine un drapeau
- * 
- * @param x La position en x de la case où dessiner le drapeau
- * @param x La position en y de la case où dessiner le drapeau
- * @param taille_case La taille des cases
-*/
-void dessine_drapeau(int x, int y, int taille_case);
-
-/**
- * @brief Change la couleur d'une case pour signifier qu'elle est découverte
- * 
- * @param x La position en x de la case à révéler
- * @param y La position en y de la case à révéler
- * @param taille_case La taille des cases
-*/
-void dessine_case_revelee(int x, int y, int taille_case);
-
-/**
- * @brief Permet de d'afficher un nombre sur une case
- * 
- * @param x La position en x de la case à révéler
- * @param y La position en y de la case à révéler
- * @param taille_case La taille des cases
- * @param nb Le nombre a afficher
-*/
-void dessine_nombre(int x, int y, int taille_case, int nb);
-
-/**
- * @brief Permet de sauvegarder la grille courrante dans le fichier `save.ga`
- * 
- * @param g Structure représentant la grille et les données qui lui sont
- *          propres
-*/
-void save(Game* g);
-
-// Fonctions gestions du jeu
-
-/**
- * @brief Permet de savoir si le jeu est perdu. Le jeu est perdu si une 
- *        mine est découverte
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @return `1` si c'est perdu, `0` sinon
-*/
-int perdu(Game g);
-
-
-/**
- * @brief Permet de savoir si la partie est gagnée. Les conditions de 
- *        victoires sont :
- *          - tous les drapeaux sont bien placés (sur des mines donc)
- *          - toutes les cases sont découvertes sauf celles des mines
- * 
- * @param g Structure représentant la grille et les données qui lui sont
- *          propres
- * 
- * @return `1` si c'est gagné, `0` sinon
-*/
-int victoire_g(Game* g);
-
-/**
- * @brief Permet de réinitialiser la grille, et l'affchage de celle ci
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param game_panel_width La largeur du panel de jeu
- * @param game_panel_height La hauteur du panel de jeu
- * @param control_panel_height La hauteur du panel des boutons
-*/
-void re_init(Game* g, int game_panel_width, int game_panel_height, 
-        int control_panel_height, int taille_case);
-
-
-/**
- * @brief Permet de savoir si une case possède une mine
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param x La coordonnée en x de la case à vérifier
- * @param y La coordonnée en y de la case à vérifier
- * @return `1` si la case possède une mine `0` sinon où si les coordonnées
- *         de la case sont en dehors de la grille
-*/
-int hasmine_g(Game* g, int x, int y);
-
-/**
- * @brief Permet de savoir combien de mines sont adjacentes a une case
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param x La coordonnée en x de la case à vérifier
- * @param y La coordonnée en y de la case à vérifier
- * @return int : le nombre de mines adjacentes (entre 0 et 8 inclus)
-*/
-int nbmines_g(Game* g, int x, int y);
-
-/**
- * @brief Permet de découvrir une case. Si la case découverte n'est pas une
- *        mines mais est adjacentes à d'autres mines, alors son contenu est 
- *        remplacé par le nombre de mines adjacentes. 
- *        Ne modifie pas l'aspect graphique
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param x La coordonnée en x de la case à découvrir
- * @param y La coordonnée en y de la case à découvrir
- * @return `1` si la case découverte est une mine, `0` sinon
-*/
-int Pied_g(Game* g, int x, int y);
-
-/**
- * @brief Permet de poser un drapeau sur une case, ou de retirer un drapeau
- *        sur une case qui en possède déjà un. Ne modifie pas l'aspect
- *        graphique
- * 
- * @param g Structure représentant la grille et les données qui lui sont 
- *          propres
- * @param x La coordonnée en x de la case où poser le drapeau
- * @param y La coordonnée en y de la case où poser le drapeau
-*/
-void Drapeau_g(Game* g, int x, int y);
-
-/* * * * * * * */
-/*  Fonctions */
-/* * * * * * * */
-
-// Lecture de fichiers + args
-
 void init_jeu(int argc, char* argv[], Game* g) {
     int fichierOK = 0;
     if (argv[argc - 1][0] != '-') {  // pas un parametre
@@ -391,6 +30,14 @@ void init_jeu(int argc, char* argv[], Game* g) {
     }
 }
 
+/**
+ * @brief Permet d'initialiser le plateau de jeu si le fichier est invalides.
+ *
+ * @param argc Le nombre d'arguements.
+ * @param argv Le tableau contenant les arguments.
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void init_jeu_avec_param(int argc, char* argv[], Game* g) {
     int seed = time(NULL);
     g->height = 10, g->width = 10, g->mines = 10;
@@ -418,6 +65,14 @@ void init_jeu_avec_param(int argc, char* argv[], Game* g) {
     ecrire_tableau_random(g);
 }
 
+/**
+ * @brief Permet de mettre des mines aléatoirement dans un tableau composé.
+ *
+ * @param i Indice de la position de l'arguement -j dans argv.
+ * @param argv Le tableau contenant les arguments.
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void lecture_arg_j(int i, char* argv[], Game* g) {
     int h = atoi(argv[i + 1]), l = atoi(argv[i + 2]), m = atoi(argv[i + 3]);
     if (m >= l * h) {
@@ -429,6 +84,12 @@ void lecture_arg_j(int i, char* argv[], Game* g) {
     g->mines = atoi(argv[i + 3]);
 }
 
+/**
+ * @brief Permet de mettre des mines aléatoirement dans un tableau composé.
+ *
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void ecrire_tableau_random(Game* g) {
     int acc = 0, i = 0, j = 0;
     while (acc != g->mines) {
@@ -441,10 +102,23 @@ void ecrire_tableau_random(Game* g) {
     }
 }
 
+/**
+ * @brief Permet de générer un nombre aléatoire entre min et max (inclu).
+ *
+ * @param min nombre minimum pouvant etre generé.
+ * @param max nombre maximum pouvant etre generé.
+ */
 int random_n(int min, int max) {
     return (rand() % (max - min + 1)) + min;
 }
 
+/**
+ * @brief Permet de lire le fichier si il est bien formé.
+ *
+ * @param fichier Fichier contenant le jeu.
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void lecture_fichier(FILE* fichier, Game* g) {
     g->height = lecture_param(fichier);
     g->width = lecture_param(fichier);
@@ -467,6 +141,13 @@ int lecture_param(FILE* fichier) {
     return val;
 }
 
+/**
+ * @brief Crée un tableau composé de 0 dans chaque case à partir de
+ *          g->height et g->width et l'initialise dans g->tableau.
+ *
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void init_tableau(Game* g) {
     int** tab = calloc(g->height, sizeof(int*));
     if (!tab) {
@@ -486,6 +167,13 @@ void init_tableau(Game* g) {
     g->terrain = tab;
 }
 
+/**
+ * @brief Permet de mettre les valeurs du fichier dans le tableau.
+ *
+ * @param fichier Fichier contenant le jeu.
+ * @param g Structure représentant la grille et les données qui lui sont
+ *         propres.
+ */
 void ecrire_tableau(FILE* fichier, Game* g) {
     for (int i = 0; i < g->height; i++) {
         for (int j = 0; j < g->width; j++) {
@@ -494,6 +182,12 @@ void ecrire_tableau(FILE* fichier, Game* g) {
     }
 }
 
+/**
+ * @brief Permet liberer la mémoire utliser par tableau sur tas.
+ *
+ * @param tab tableau contenant des adresses de tableaux.
+ * @param lignes nombre de ligne du tableau.
+ */
 void free_2d_tab(int** tab, int lignes) {
     for (int i = 0; i < lignes; i++) {
         free(tab[i]);
@@ -503,11 +197,27 @@ void free_2d_tab(int** tab, int lignes) {
 
 // Fonctions graphiques
 
+/**
+ * @brief Enregistrement de la fonction de call back pour la lib MLV
+ *        lors de la fermeture de la fenêtre
+ * 
+ * @param data 
+*/
 void stop_affichage(void* data) {
 	int* arret = (int*) data;
 	*arret = 1;
 }
 
+/**
+ * @brief Permet d'afficher les lignes sur la fenêtre représentant la grille
+ *        de jeu
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param game_panel_width La largeur de la grille de jeu
+ * @param game_panel_height La hauteur de la grille de jeu
+ * @param taille_case La taille des cases du jeu
+*/
 void affiche_lignes(Game g, int game_panel_width, int game_panel_height,
                     int taille_case) {
     MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height, 
@@ -525,6 +235,19 @@ void affiche_lignes(Game g, int game_panel_width, int game_panel_height,
     }
 }
 
+/**
+ * @brief Affiche les boutons permettant d'interagir avec le programme
+ *        pour quitter ou recommencer une partie
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param control_panel_width La largeur du panel avec les boutons
+ * @param game_panel_height La hauteur du panel de jeu avec la grille 
+ *        représentée. Cette donnée est important car le panel avec les
+ *        boutons se trouvant en dessous de la grille de jeu, il se trouve
+ *        alors a y = game_panel_height
+ * @param control_panel_height La hauteur du panel avec les boutons
+*/
 void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
                     int control_panel_height) {
     MLV_draw_filled_rectangle(0, game_panel_height + 1, control_panel_width,
@@ -561,6 +284,13 @@ void affiche_boutons(Game g, int control_panel_width, int game_panel_height,
                  );
 }
 
+/**
+ * @brief Affiche l'actuel status d'une grille
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param taille_case La taille des cases
+*/
 void affiche_grille(Game g, int taille_case) {
     for (int y = 0; y < g.height; y++) {
         for (int x = 0; x < g.width; x++) {
@@ -576,6 +306,12 @@ void affiche_grille(Game g, int taille_case) {
     }
 }
 
+/**
+ * @brief Affiche le message "Victoire !" en cas de victoire
+ * 
+ * @param game_panel_width La largeur du panel de jeu
+ * @param game_panel_height La hauteur du panel de jeu
+*/
 void affiche_victoire(int game_panel_width, int game_panel_height) {
     MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height,
                              MLV_COLOR_WHITE);
@@ -589,6 +325,12 @@ void affiche_victoire(int game_panel_width, int game_panel_height) {
     MLV_update_window();
 }
 
+/**
+ * @brief Affiche le message "Défaite !" en cas de défaite
+ * 
+ * @param game_panel_width La largeur du panel de jeu
+ * @param game_panel_height La hauteur du panel de jeu
+*/
 void affiche_defaite(int game_panel_width, int game_panel_height) {
     MLV_draw_filled_rectangle(0, 0, game_panel_width, game_panel_height,
                              MLV_COLOR_WHITE);
@@ -602,11 +344,29 @@ void affiche_defaite(int game_panel_width, int game_panel_height) {
     MLV_update_window();
 }
 
+/**
+ * @brief Permet de convertir la position de la souris par sa position dans
+ *        la grille
+ * 
+ * @param x La position en x de la souris, qui est modifié pour prendre la 
+ *          valeur en x dans le tableau
+ * @param y La position en y de la souris, qui est modifié pour prendre la 
+ *          valeur en y dans le tableau
+ * @param taille_case La taille des cases du jeu
+*/
 void convert_screen_coords_to_grid_coords(int* x, int* y, int taille_case) {
     *x = *x / taille_case;
     *y = *y / taille_case;
 }
 
+/**
+ * @brief Fonction qui permet d'afficher la fenêtre et d'interagir avec
+ *        l'utilisateur. Elle est également responsable de gérer la 
+ *        fermeture de la fenêtre
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+*/
 void play(Game g) {
     int arret = 0;
     // On enregistre la fonction de call back
@@ -654,6 +414,29 @@ void play(Game g) {
     MLV_free_window();
 }
 
+
+/**
+ * @brief Fonction permettant de déterminer les actions de l'utilisateur et
+ *        d'agir en conséquence. Les interactions possibles de l'utilisateurs
+ *        sont des clics gauche ou droit.
+ *        Les actions possibles sont :
+ *         - Fermeture du jeu (par la "x" de la fenêtre ou en cliquant sur
+ *           le bouton "Quitter") ;
+ *         - Recommencer la partie (en cliquant sur le bouton "Recommencer");
+ *         - Découvrir une case (en faisant un clique gauche sur la grille);
+ *         - Déposer un drapeau (en faisant un clique droit sur la grille)
+ *
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param game_panel_width La largeur du panel de jeu
+ * @param game_panel_height La hauteur du panel de jeu
+ * @param control_panel_height La hauteur du panel des boutons
+ * @param x La position en x de la souris
+ * @param y La position en y de la souris
+ * @param taille_case La taille des cases du jeu
+ * @param arret Argument modifié à `1` si l'utilisateur souhaite quitter 
+ *        la partie
+*/
 void action(Game g, int game_panel_width, int game_panel_height, 
            int control_panel_height, int x, int y, int taille_case, 
            int* arret) {
@@ -717,6 +500,17 @@ void action(Game g, int game_panel_width, int game_panel_height,
     }
 }
 
+/**
+ * @brief Fonction permettant de découvrir une case. Si la case n'est pas une
+ *        mine ou n'est pas adjacente à une mine, elle révèle les cases 
+ *        adjacentes etc. Modifie l'aspect graphique de la grille
+ *
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La position en x de la case a révéler
+ * @param y La position en y de la case a révéler
+ * @param taille_case La taille des cases du jeu
+*/
 void revele_propagation(Game* g, int x, int y, int taille_case) {
     if ((0 <= x && x < g->width) && (0 <= y && y < g->height)) {
         int prev = g->terrain[y][x];
@@ -742,7 +536,8 @@ void revele_propagation(Game* g, int x, int y, int taille_case) {
                         if ((0 <= adjacentes[i][0] 
                              && adjacentes[i][0] < g->width) 
                             && (0 <= adjacentes[i][1] 
-                             && adjacentes[i][1] < g->height)) {    
+                             && adjacentes[i][1] < g->height)
+                        ) {    
                             if (g->terrain[adjacentes[i][1]][adjacentes[i][0]] == 0) {
                                 revele_propagation(g, adjacentes[i][0], 
                                                   adjacentes[i][1],
@@ -756,6 +551,15 @@ void revele_propagation(Game* g, int x, int y, int taille_case) {
     }
 }
 
+/** @brief Permet de poser un drapeau. Si un drapeau est déjà présent,
+ *        le drapeau est retiré. Modifie l'aspect graphique de la grille
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La position en x de la case où poser le drapeau
+ * @param y La position en y de la case où poser le drapeau
+ * @param taille_case La taille des cases du jeu
+*/
 void poser_drapeau(Game* g, int x, int y, int taille_case) {
     int previous = g->terrain[y][x];
     Drapeau_g(g, x, y);
@@ -776,6 +580,13 @@ void poser_drapeau(Game* g, int x, int y, int taille_case) {
     }
 }
 
+/**
+ * @brief Dessine un drapeau
+ * 
+ * @param x La position en x de la case où dessiner le drapeau
+ * @param x La position en y de la case où dessiner le drapeau
+ * @param taille_case La taille des cases
+*/
 void dessine_drapeau(int x, int y, int taille_case) {
     int xx[3] = {
         x * taille_case + taille_case/4,
@@ -790,6 +601,13 @@ void dessine_drapeau(int x, int y, int taille_case) {
     MLV_draw_filled_polygon(xx, yy, 3, MLV_COLOR_RED);
 }
 
+/**
+ * @brief Change la couleur d'une case pour signifier qu'elle est découverte
+ * 
+ * @param x La position en x de la case à révéler
+ * @param y La position en y de la case à révéler
+ * @param taille_case La taille des cases
+*/
 void dessine_case_revelee(int x, int y, int taille_case) {
     MLV_draw_filled_rectangle(
                             x * taille_case + 1,
@@ -800,45 +618,35 @@ void dessine_case_revelee(int x, int y, int taille_case) {
                             );
 }
 
+/**
+ * @brief Permet de d'afficher un nombre sur une case
+ * 
+ * @param x La position en x de la case à révéler
+ * @param y La position en y de la case à révéler
+ * @param taille_case La taille des cases
+ * @param nb Le nombre a afficher
+*/
 void dessine_nombre(int x, int y, int taille_case, int nb) {
-    MLV_Color couleur = MLV_COLOR_WHITE;
-    switch (nb) {
-        case 1:
-            couleur = MLV_COLOR_BLUE;
-            break;
-        case 2:
-            couleur = MLV_COLOR_GREEN;
-            break;
-        case 3:
-            couleur = MLV_COLOR_RED;
-            break;
-        case 4:
-            couleur = MLV_COLOR_PURPLE;
-            break;
-        case 5:
-            couleur = MLV_COLOR_MAROON;
-            break;
-        case 6:
-            couleur = MLV_COLOR_TURQUOISE;
-            break;
-        case 7:
-            couleur = MLV_COLOR_BLACK;
-            break;
-        case 8:
-            couleur = MLV_COLOR_GRAY;
-            break;
-        default:
-            return;
-    }
+    MLV_Color tabColor[8] = {
+        MLV_COLOR_BLUE, MLV_COLOR_GREEN, MLV_COLOR_RED, MLV_COLOR_PURPLE,
+        MLV_COLOR_MAROON, MLV_COLOR_TURQUOISE, MLV_COLOR_BLACK, 
+        MLV_COLOR_GRAY
+    };
     MLV_draw_text(
                  x * taille_case + taille_case/2,
                  y * taille_case + taille_case/2,
                  "%d",
-                 couleur,
+                 tabColor[(nb - 1) % 8],
                  nb
                  );
 }
 
+/**
+ * @brief Permet de sauvegarder la grille courrante dans le fichier `save.ga`
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont
+ *          propres
+*/
 void save(Game* g) {
     // On ouvre un fichier
     FILE* f = fopen("save.ga", "w");
@@ -862,6 +670,14 @@ void save(Game* g) {
 
 // Fonctions gestions du jeu
 
+/**
+ * @brief Permet de savoir si le jeu est perdu. Le jeu est perdu si une 
+ *        mine est découverte
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @return `1` si c'est perdu, `0` sinon
+*/
 int perdu(Game g) {
     for (int y = 0; y < g.height; y++) {
         for (int x = 0; x < g.width; x++) {
@@ -873,6 +689,17 @@ int perdu(Game g) {
     return 0;
 }
 
+/**
+ * @brief Permet de savoir si la partie est gagnée. Les conditions de 
+ *        victoires sont :
+ *          - tous les drapeaux sont bien placés (sur des mines donc)
+ *          - toutes les cases sont découvertes sauf celles des mines
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont
+ *          propres
+ * 
+ * @return `1` si c'est gagné, `0` sinon
+*/
 int victoire_g(Game* g) {
     int nb_drapeau_bien_place = 0;
     int nb_mines = 0;
@@ -897,6 +724,15 @@ int victoire_g(Game* g) {
            || ((g->width * g->height - cases_decouvertes) == nb_mines);
 }
 
+/**
+ * @brief Permet de réinitialiser la grille, et l'affchage de celle ci
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param game_panel_width La largeur du panel de jeu
+ * @param game_panel_height La hauteur du panel de jeu
+ * @param control_panel_height La hauteur du panel des boutons
+*/
 void re_init(Game* g, int game_panel_width, int game_panel_height, 
              int control_panel_height, int taille_case) {
     // On réinitialise le plateau
@@ -916,6 +752,16 @@ void re_init(Game* g, int game_panel_width, int game_panel_height,
     MLV_update_window();
 }
 
+/**
+ * @brief Permet de savoir si une case possède une mine
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La coordonnée en x de la case à vérifier
+ * @param y La coordonnée en y de la case à vérifier
+ * @return `1` si la case possède une mine `0` sinon où si les coordonnées
+ *         de la case sont en dehors de la grille
+*/
 int hasmine_g(Game* g, int x, int y) {
     if ((0 <= x && x < g->width) && (0 <= y && y < g->height)) {
         if (g->terrain[y][x] == 9 || g->terrain[y][x] == -9) {
@@ -925,6 +771,15 @@ int hasmine_g(Game* g, int x, int y) {
     return 0;
 }
 
+/**
+ * @brief Permet de savoir combien de mines sont adjacentes a une case
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La coordonnée en x de la case à vérifier
+ * @param y La coordonnée en y de la case à vérifier
+ * @return int : le nombre de mines adjacentes (entre 0 et 8 inclus)
+*/
 int nbmines_g(Game* g, int x, int y) {
     int coords[8][2] = {
         {x+1, y},
@@ -943,6 +798,18 @@ int nbmines_g(Game* g, int x, int y) {
     return cpt;
 }
 
+/**
+ * @brief Permet de découvrir une case. Si la case découverte n'est pas une
+ *        mines mais est adjacentes à d'autres mines, alors son contenu est 
+ *        remplacé par le nombre de mines adjacentes. 
+ *        Ne modifie pas l'aspect graphique
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La coordonnée en x de la case à découvrir
+ * @param y La coordonnée en y de la case à découvrir
+ * @return `1` si la case découverte est une mine, `0` sinon
+*/
 int Pied_g(Game* g, int x, int y) {
     if (g->terrain[y][x] == 9) {
         g->terrain[y][x] = 10;
@@ -959,6 +826,16 @@ int Pied_g(Game* g, int x, int y) {
     return 0;
 }
 
+/**
+ * @brief Permet de poser un drapeau sur une case, ou de retirer un drapeau
+ *        sur une case qui en possède déjà un. Ne modifie pas l'aspect
+ *        graphique
+ * 
+ * @param g Structure représentant la grille et les données qui lui sont 
+ *          propres
+ * @param x La coordonnée en x de la case où poser le drapeau
+ * @param y La coordonnée en y de la case où poser le drapeau
+*/
 void Drapeau_g(Game* g, int x, int y) {
     if (0 <= x && x < g->width) {
         if (0 <= y && y < g->height) {
