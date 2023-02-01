@@ -1,10 +1,10 @@
 # Démineur - Laborde Quentin, Kies Rémy 
 
-![LOGO](./screens/Logo_Université_Gustave_Eiffel_2020.svg.png)
+![LOGO](./screenshots/Logo_Université_Gustave_Eiffel_2020.svg.png)
 
 ___
 
-![SCREENSHOT](./screens/game.png)
+![SCREENSHOT](./screenshots/game.png)
 
 Sommaire :
 - [Démineur - Laborde Quentin, Kies Rémy](#démineur---laborde-quentin-kies-rémy)
