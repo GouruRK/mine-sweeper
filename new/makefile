@@ -23,11 +23,12 @@ $(BUILD_DIR)/$(EXEC): $(OBJS)
 	$(CC) $^ -o $@ $(LIBS)
 
 # Dépendances
-main.o: main.c game.h graph.h init.h interaction.h struct.h
+main.o: main.c game.h graph.h init.h interaction.h struct.h tool.h
 game.o: struct.h game.h
 graph.o: struct.h graph.h
 init.o: struct.h init.h
 interaction.o: struct.h interaction.h
+tool.o: struct.h tool.h
 
 # Création des fichiers objets à partir des fichiers sources
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c

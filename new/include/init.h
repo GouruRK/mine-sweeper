@@ -11,4 +11,10 @@
 #ifndef __INIT_INIT__
 #define __INIT_INIT__
 
+#include "struct.h"
+
+Game init_game(void);
+Cell** init_board(int width, int height);
+void free_board(Cell** tab, int line);
+
 #endif

@@ -28,12 +28,13 @@ typedef enum {
 } Cell;
 
 typedef struct {
+    int seed;
     int width;
     int height;
     int cell_w;
     int cell_h;
     int mines;
-    int** terrain;
+    Cell** terrain;
     int finished;
 } Game;
 
