@@ -21,9 +21,9 @@ typedef enum {
     SIX,
     SEVEN,
     EIGHT,
-    FLAG,
     MINE,
     FLAG_MINE,
+    FLAG,
     EMPTY
 } Cell;
 
@@ -34,6 +34,7 @@ typedef struct {
     int cell_w;
     int cell_h;
     int mines;
+    char* map;
     Cell** terrain;
     int finished;
 } Game;

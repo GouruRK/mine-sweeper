@@ -11,4 +11,9 @@
 #ifndef __INIT_INTER__
 #define __INIT_INTER__
 
+#include "struct.h"
+
+Game parser(int argc, char** argv);
+int read_file(Game* g);
+
 #endif

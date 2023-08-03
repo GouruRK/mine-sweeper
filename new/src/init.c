@@ -15,16 +15,16 @@
 #include "../include/struct.h"
 
 Game init_game(void) {
-    Game g;
-    g.cell_h = 0;
-    g.cell_w = 0;
-
-    g.width = 10;
-    g.height = 10;
-
-    g.finished = 0;
-    g.mines = 10;
-    g.terrain = NULL;
+    Game g = {
+        .cell_h = 0,
+        .cell_w = 0,
+        .width = 10,
+        .height = 10,
+        .seed = 0,
+        .finished = 0,
+        .mines = 10,
+        .terrain = NULL,
+        .map = NULL};
     return g;
 }
 

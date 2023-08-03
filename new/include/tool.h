@@ -13,6 +13,7 @@
 
 #include "struct.h"
 
-void print_ms(Game g);
+void print_board(Game g);
+void print_game(Game g);
 
 #endif

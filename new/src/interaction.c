@@ -17,7 +17,7 @@
 #include "../include/init.h"
 #include "../include/struct.h"
 
-void parser(int argc, char** argv) {
+Game parser(int argc, char** argv) {
     int option_index = 0, opt;
     Game g = init_game();
     static struct option long_options[] = {
@@ -28,7 +28,9 @@ void parser(int argc, char** argv) {
 
     while ((opt = getopt_long(argc, argv, "hc:r:", long_options, &option_index)) != -1) {
         switch (opt) {
-            case 'c':
+            case 'c':;
+                /* :; to avoid (pedantic):
+                'a label can only be part of a statement and a declaration is not a statement'. */
                 int h, w, m, ok;
                 ok = sscanf(optarg, "%d %d %d", &h, &w, &m);
                 if (ok == 3) {
@@ -41,7 +43,7 @@ void parser(int argc, char** argv) {
                 }
                 break;
 
-            case 'r':
+            case 'r':;
                 int r;
                 ok = sscanf(optarg, "%d", &r);
                 if (ok == 1) {
@@ -52,8 +54,59 @@ void parser(int argc, char** argv) {
                 }
                 break;
 
+            case 'h':
+                printf("One day maybe...\n");
+                break;
+
             default:
                 break;
         }
     }
+    if (optind < argc) {
+        if (optind == argc - 1) {
+            g.map = argv[optind];
+        } else {
+            printf("Too much arguments (1 for map)\n");
+        }
+    }
+    return g;
+}
+
+int read_file(Game* g) {
+    if (!g->map) {
+        return 0;
+    }
+    int acc = 0, val;
+    FILE* f = fopen(g->map, "r");
+    if (!f) {
+        return 0;
+    }
+    int h, w, m, ok;
+    ok = fscanf(f, "%d %d %d\n", &h, &w, &m);
+
+    if (ok != 3) {
+        fclose(f);
+        return 0;
+    }
+    g->terrain = init_board(w, h);
+    if (!g->terrain) {
+        fclose(f);
+        return 0;
+    }
+    while (fscanf(f, "%d", &val) != EOF) {
+        if (val != 0) {
+            int line = acc / w;
+            int col = acc - line * w;
+            g->terrain[line][col] = val;
+        }
+        acc++;
+    }
+    if (acc != w * h) {
+        printf("Oh no\n");
+    }
+    g->height = h;
+    g->width = w;
+    g->mines = m;
+    fclose(f);
+    return 1;
 }
