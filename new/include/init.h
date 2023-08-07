@@ -14,7 +14,8 @@
 #include "struct.h"
 
 Game init_game(void);
-Cell** init_board(int width, int height);
+Cell** init_board_empty(int width, int height);
+Cell** init_board_full(int width, int height);
 void free_board(Cell** tab, int line);
 
 #endif

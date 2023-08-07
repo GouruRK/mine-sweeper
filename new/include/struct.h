@@ -22,6 +22,7 @@ typedef enum {
     SEVEN,
     EIGHT,
     MINE,
+    EXPLOSION,
     FLAG_MINE,
     FLAG,
     EMPTY

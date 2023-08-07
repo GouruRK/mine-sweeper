@@ -10,6 +10,7 @@
 #include "../include/tool.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../include/struct.h"
 
@@ -30,4 +31,8 @@ void print_game(Game g) {
     if (g.terrain) {
         print_board(g);
     }
+}
+
+int random_coord(int max) {
+    return rand() % (max + 1);
 }

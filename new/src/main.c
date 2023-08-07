@@ -18,10 +18,5 @@
 #include "../include/tool.h"
 
 int main(int argc, char *argv[]) {
-    Game g = parser(argc, argv);
-    if (g.map) {
-        read_file(&g);
-    }
-    print_game(g);
     return 0;
 }

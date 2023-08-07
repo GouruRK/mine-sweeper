@@ -88,7 +88,7 @@ int read_file(Game* g) {
         fclose(f);
         return 0;
     }
-    g->terrain = init_board(w, h);
+    g->terrain = init_board_empty(w, h);
     if (!g->terrain) {
         fclose(f);
         return 0;

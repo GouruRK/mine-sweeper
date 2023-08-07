@@ -26,7 +26,7 @@ $(BUILD_DIR)/$(EXEC): $(OBJS)
 main.o: main.c game.h graph.h init.h interaction.h struct.h tool.h
 game.o: struct.h game.h
 graph.o: struct.h graph.h
-init.o: struct.h init.h
+init.o: struct.h init.h tool.h
 interaction.o: struct.h interaction.h
 tool.o: struct.h tool.h
 
