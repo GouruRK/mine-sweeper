@@ -17,5 +17,7 @@ int is_in_board(int width, int height, int x, int y);
 int nb_mines(Game* g, int x, int y);
 int brake_cell(Game* g, int x, int y);
 void flag_cell(Game* g, int x, int y);
+int victory(Game* g);
+int defeat(Game* g);
 
 #endif

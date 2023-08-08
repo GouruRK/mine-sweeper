@@ -21,16 +21,9 @@ int nb_mines(Game* g, int x, int y) {
     if (!is_in_board(g->width, g->height, x, y)) {
         return 0;
     }
-    int coords[8][2] = {
-        {x + 1, y},
-        {x + 1, y + 1},
-        {x + 1, y - 1},
-        {x, y + 1},
-        {x, y - 1},
-        {x - 1, y},
-        {x - 1, y + 1},
-        {x - 1, y - 1}};
+    int coords[8][2] = NEIGHBOR(x, y);
     int acc = 0;
+
     for (int i = 0; i < 8; i++) {
         acc += (is_in_board(g->width, g->height, coords[i][0], coords[i][1]) &&
                 (g->terrain[y][x] == MINE || g->terrain[y][x] == FLAG_MINE));
@@ -48,7 +41,7 @@ int brake_cell(Game* g, int x, int y) {
     }
     if (g->terrain[y][x] == UNDISCOVERED) {
         int val = nb_mines(g, x, y);
-        (val == 0) ? (g->terrain[y][x] = EMPTY) : (g->terrain[y][x] = val);
+        g->terrain[y][x] = (!val) ? EMPTY : val;
     }
     return 0;
 }
@@ -68,4 +61,35 @@ void flag_cell(Game* g, int x, int y) {
     } else if (c == UNDISCOVERED) {
         c = FLAG;
     }
+}
+
+int victory(Game* g) {
+    int win_all_discovered = 1;
+    int acc_flag_mine = 0;
+
+    for (int y = 0; y < g->height; y++) {
+        for (int x = 0; x < g->width; x++) {
+            Cell c = g->terrain[y][x];
+
+            if (c == FLAG) {
+                return 0;
+            } else if (c == FLAG_MINE) {
+                acc_flag_mine++;
+            } else if (c == UNDISCOVERED) {
+                win_all_discovered = 0;
+            }
+        }
+    }
+    return win_all_discovered || acc_flag_mine == g->mines;
+}
+
+int defeat(Game* g) {
+    for (int y = 0; y < g->height; y++) {
+        for (int x = 0; x < g->width; x++) {
+            if (g->terrain[y][x] == EXPLOSION) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 }

@@ -11,6 +11,18 @@
 #ifndef __INIT_STRUCT__
 #define __INIT_STRUCT__
 
+#define NEIGHBOR(x, y)          \
+    {                           \
+        {(x) + 1, (y)},         \
+            {(x) + 1, (y) + 1}, \
+            {(x) + 1, (y)-1},   \
+            {(x), (y) + 1},     \
+            {(x), (y)-1},       \
+            {(x)-1, (y)},       \
+            {(x)-1, (y) + 1},   \
+        { (x) - 1, (y)-1 }      \
+    }
+
 typedef enum {
     UNDISCOVERED,
     ONE,
