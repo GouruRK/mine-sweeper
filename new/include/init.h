@@ -16,6 +16,7 @@
 Game init_game(void);
 Cell** init_board_empty(int width, int height);
 Cell** init_board_full(int width, int height);
+int create_game_param(Game* g);
 void free_board(Cell** tab, int line);
 
 #endif

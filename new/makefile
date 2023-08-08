@@ -3,7 +3,7 @@ BUILD_DIR=build
 SRC_DIR=src
 INC_DIR=include
 INCLUDE=-I$(INC_DIR)
-LIBS=-lMLV
+LIBS=
 CFLAGS= -Wall -std=c17 -pedantic
 
 EXEC=minesweeper

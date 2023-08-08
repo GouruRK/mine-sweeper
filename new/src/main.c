@@ -18,5 +18,9 @@
 #include "../include/tool.h"
 
 int main(int argc, char *argv[]) {
+    Game g = init_game();
+    g.terrain = init_board_full(g.width, g.height);
+    print_board(g);
+    free_board(g.terrain, g.width);
     return 0;
 }
