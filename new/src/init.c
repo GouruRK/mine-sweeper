@@ -17,8 +17,7 @@
 
 Game init_game(void) {
     Game g = {
-        .cell_h = 0,
-        .cell_w = 0,
+        .cell_size = 100,
         .width = 10,
         .height = 10,
         .seed = 0,

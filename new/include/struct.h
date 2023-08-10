@@ -44,8 +44,7 @@ typedef struct {
     int seed;
     int width;
     int height;
-    int cell_w;
-    int cell_h;
+    int cell_size;
     int mines;
     char* map;
     Cell** terrain;

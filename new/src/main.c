@@ -8,7 +8,9 @@
  *
  */
 
-#include <stdio.h>
+#include <MLV/MLV_all.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "../include/game.h"
 #include "../include/graph.h"
@@ -18,9 +20,16 @@
 #include "../include/tool.h"
 
 int main(int argc, char *argv[]) {
-    Game g = init_game();
-    g.terrain = init_board_full(g.width, g.height);
-    print_board(g);
-    free_board(g.terrain, g.width);
+    int stop = 0;
+    srand(time(NULL));
+    MLV_execute_at_exit(exit_function, &stop);
+    MLV_create_window("Minesweeper", "Minesweeper", 400, 400);
+    MLV_change_default_font("../extern_file/mine_sweeper.ttf", 400 / 2);
+    // draw_undiscorvered(0, 0, 400);
+    // draw_flag(0, 0, 100);
+    draw_discovered(0, 0, 400, 1);
+    MLV_update_window();
+    MLV_wait_seconds(10);
+    MLV_free_window();
     return 0;
 }
