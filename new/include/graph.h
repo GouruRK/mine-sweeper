@@ -11,9 +11,12 @@
 #ifndef __INIT_GRAPH__
 #define __INIT_GRAPH__
 
+#include "struct.h"
+
 void exit_function(void* data);
 void draw_undiscorvered(int x, int y, int cell_size);
 void draw_flag(int x, int y, int cell_size);
 void draw_discovered(int x, int y, int cell_size, int val);
+void draw_game(Game g);
 
 #endif

@@ -48,6 +48,7 @@ Game parser(int argc, char** argv) {
                 ok = sscanf(optarg, "%d", &r);
                 if (ok == 1) {
                     g.seed = r;
+                    g.seed_flag = 1;
                 } else {
                     fprintf(stderr, "/!\\ Unexpected character in -r option /!\\ \n");
                     fprintf(stderr, "Modification will not be considered.\n");

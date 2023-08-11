@@ -9,6 +9,7 @@
  */
 #include "../include/tool.h"
 
+#include <MLV/MLV_all.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -35,4 +36,17 @@ void print_game(Game g) {
 
 int random_coord(int max) {
     return rand() % (max + 1);
+}
+
+void resize_game(Game* g) {
+    int win_w = MLV_get_desktop_width(), win_h = MLV_get_desktop_height();
+
+    if ((g->cell_size * g->width > win_w) ||
+        (g->cell_size * g->height + GRAPHIC_SAFETY_MARGIN > win_h)) {
+        if (win_w < win_h) {
+            g->cell_size = win_w / g->width;
+        } else {
+            g->cell_size = (win_h - GRAPHIC_SAFETY_MARGIN) / g->height;
+        }
+    }
 }

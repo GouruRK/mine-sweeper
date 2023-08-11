@@ -16,5 +16,6 @@
 void print_board(Game g);
 void print_game(Game g);
 int random_coord(int max);
+void resize_game(Game* g);
 
 #endif

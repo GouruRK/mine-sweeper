@@ -11,6 +11,8 @@
 #ifndef __INIT_STRUCT__
 #define __INIT_STRUCT__
 
+#define GRAPHIC_SAFETY_MARGIN 300
+
 #define NEIGHBOR(x, y)          \
     {                           \
         {(x) + 1, (y)},         \
@@ -41,6 +43,7 @@ typedef enum {
 } Cell;
 
 typedef struct {
+    int seed_flag;
     int seed;
     int width;
     int height;

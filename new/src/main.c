@@ -20,16 +20,31 @@
 #include "../include/tool.h"
 
 int main(int argc, char *argv[]) {
-    int stop = 0;
-    srand(time(NULL));
+    int stop = 0, valid_file = 0;
+
+    Game g = parser(argc, argv);
+    srand((g.seed_flag) ? (g.seed) : (time(NULL)));
+
+    valid_file = read_file(&g);
+    if (!valid_file) {
+        g.terrain = init_board_empty(g.width, g.height);
+        if (!g.terrain) {
+            fprintf(stderr, "Terrain not loaded\n End of execution\n");
+            return EXIT_FAILURE;
+        }
+    }
+    resize_game(&g);
+
+    print_game(g);
+    fprintf(stderr, "c oui\n");
+
     MLV_execute_at_exit(exit_function, &stop);
-    MLV_create_window("Minesweeper", "Minesweeper", 400, 400);
-    MLV_change_default_font("../extern_file/mine_sweeper.ttf", 400 / 2);
-    // draw_undiscorvered(0, 0, 400);
-    // draw_flag(0, 0, 100);
-    draw_discovered(0, 0, 400, 1);
+    MLV_create_window("Minesweeper", "Minesweeper", g.cell_size * g.width, g.cell_size * g.height);
+    MLV_change_default_font("../extern_file/mine_sweeper.ttf", g.cell_size / 2);
+    draw_game(g);
+    draw_flag(0, 0, g.cell_size);
     MLV_update_window();
-    MLV_wait_seconds(10);
+    MLV_wait_seconds(5);
     MLV_free_window();
     return 0;
 }

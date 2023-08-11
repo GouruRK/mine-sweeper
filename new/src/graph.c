@@ -67,7 +67,7 @@ void draw_flag(int x, int y, int cell_size) {
 
                              // same as 2st rectangle start x
                              s_x + 2.5 * border,
-                             s_y + 3.75 * border,
+                             s_y + 4.5 * border,
                              MLV_COLOR_RED);
 }
 
@@ -93,4 +93,19 @@ void draw_discovered(int x, int y, int cell_size, int val) {
     MLV_draw_text(s_x + cell_size / 2 - text_w / 2,
                   s_y + cell_size / 2 - text_h / 2,
                   "1", tab_col[val - 1]);
+}
+
+void draw_game(Game g) {
+    Cell c;
+    for (int y = 0; y < g.height; y++) {
+        for (int x = 0; x < g.width; x++) {
+            c = g.terrain[y][x];
+            if (c == UNDISCOVERED || c == MINE) {
+                draw_undiscorvered(x, y, g.cell_size);
+            } else if (c == FLAG || c == FLAG_MINE) {
+                draw_undiscorvered(x, y, g.cell_size);
+                draw_flag(x, y, g.cell_size);
+            }
+        }
+    }
 }

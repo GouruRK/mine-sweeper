@@ -20,6 +20,7 @@ Game init_game(void) {
         .cell_size = 100,
         .width = 10,
         .height = 10,
+        .seed_flag = 0,
         .seed = 0,
         .finished = 0,
         .mines = 10,
