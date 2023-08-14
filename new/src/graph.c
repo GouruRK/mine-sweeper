@@ -89,10 +89,12 @@ void draw_discovered(int x, int y, int cell_size, int val) {
     MLV_draw_filled_rectangle(s_x, s_y,
                               cell_size, cell_size,
                               MLV_COLOR_GREY);
-    MLV_get_size_of_text("1", &text_w, &text_h);
-    MLV_draw_text(s_x + cell_size / 2 - text_w / 2,
-                  s_y + cell_size / 2 - text_h / 2,
-                  "1", tab_col[val - 1]);
+    if (val != EMPTY) {
+        MLV_get_size_of_text("%d", &text_w, &text_h, val);
+        MLV_draw_text(s_x + cell_size / 2 - text_w / 2,
+                      s_y + cell_size / 2 - text_h / 2,
+                      "%d", tab_col[val - 1], val);
+    }
 }
 
 void draw_game(Game g) {

@@ -4,7 +4,7 @@ SRC_DIR=src
 INC_DIR=include
 INCLUDE=-I$(INC_DIR)
 LIBS=-lMLV
-CFLAGS= -Wall -std=c17 -pedantic
+CFLAGS= -Wall -std=c17 -pedantic -g -g3
 
 EXEC=minesweeper
 

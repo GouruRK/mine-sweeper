@@ -11,7 +11,7 @@
 #ifndef __INIT_STRUCT__
 #define __INIT_STRUCT__
 
-#define GRAPHIC_SAFETY_MARGIN 300
+#define GRAPHIC_SAFETY_MARGIN 200
 
 #define NEIGHBOR(x, y)          \
     {                           \

@@ -64,7 +64,7 @@ Cell** init_board_full(int width, int height) {
     return tab;
 }
 
-int create_game_param(Game* g) {
+int create_game_param(Game* g, int user_x, int user_y) {
     if (g->mines > (g->height * g->width) / 2) {
         g->terrain = init_board_full(g->width, g->height);
     } else {
@@ -76,22 +76,24 @@ int create_game_param(Game* g) {
     }
 
     if (g->mines > (g->height * g->width) / 2) {
-        for (int i = 0; i < g->height * g->width - g->mines; i++) {
-            int x = random_coord(g->width);
-            int y = random_coord(g->height);
+        g->terrain[user_y][user_y] = UNDISCOVERED;
+
+        for (int i = 0; i < g->height * g->width - g->mines - 1; i++) {
+            int x = random_coord(g->width - 1);
+            int y = random_coord(g->height - 1);
             while (g->terrain[y][x] == UNDISCOVERED) {
-                x = random_coord(g->width);
-                y = random_coord(g->height);
+                x = random_coord(g->width - 1);
+                y = random_coord(g->height - 1);
             }
             g->terrain[y][x] = UNDISCOVERED;
         }
     } else {
         for (int i = 0; i < g->mines; i++) {
-            int x = random_coord(g->width);
-            int y = random_coord(g->height);
-            while (g->terrain[y][x] == MINE) {
-                x = random_coord(g->width);
-                y = random_coord(g->height);
+            int x = random_coord(g->width - 1);
+            int y = random_coord(g->height - 1);
+            while (g->terrain[y][x] == MINE && x != user_x && y != user_y) {
+                x = random_coord(g->width - 1);
+                y = random_coord(g->height - 1);
             }
             g->terrain[y][x] = MINE;
         }

@@ -10,6 +10,8 @@
 
 #include "../include/game.h"
 
+#include <stdio.h>
+
 #include "../include/struct.h"
 
 int is_in_board(int width, int height, int x, int y) {
@@ -25,13 +27,14 @@ int nb_mines(Game* g, int x, int y) {
     int acc = 0;
 
     for (int i = 0; i < 8; i++) {
-        acc += (is_in_board(g->width, g->height, coords[i][0], coords[i][1]) &&
-                (g->terrain[y][x] == MINE || g->terrain[y][x] == FLAG_MINE));
+        int n_x = coords[i][0], n_y = coords[i][1];
+        acc += (is_in_board(g->width, g->height, n_x, n_y) &&
+                (g->terrain[n_y][n_x] == MINE || g->terrain[n_y][n_x] == FLAG_MINE));
     }
     return acc;
 }
 
-int brake_cell(Game* g, int x, int y) {
+int break_cell(Game* g, int x, int y) {
     if (!is_in_board(g->width, g->height, x, y)) {
         return 0;
     }
@@ -41,6 +44,7 @@ int brake_cell(Game* g, int x, int y) {
     }
     if (g->terrain[y][x] == UNDISCOVERED) {
         int val = nb_mines(g, x, y);
+        fprintf(stderr, "voisin %d", val);
         g->terrain[y][x] = (!val) ? EMPTY : val;
     }
     return 0;
@@ -92,4 +96,7 @@ int defeat(Game* g) {
         }
     }
     return 0;
+}
+
+void extend_undiscovered(Game* g, int x, int y) {
 }

@@ -19,7 +19,7 @@ void print_board(Game g) {
     printf("Board:\n");
     for (int y = 0; y < g.height; y++) {
         for (int x = 0; x < g.width; x++) {
-            printf("%d", g.terrain[y][x]);
+            printf("%3d", g.terrain[y][x]);
         }
         printf("\n");
     }
@@ -49,4 +49,9 @@ void resize_game(Game* g) {
             g->cell_size = (win_h - GRAPHIC_SAFETY_MARGIN) / g->height;
         }
     }
+}
+
+void coord_to_cell(int* x, int* y, int cell_size) {
+    *x = *x / cell_size;
+    *y = *y / cell_size;
 }
