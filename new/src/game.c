@@ -10,9 +10,12 @@
 
 #include "../include/game.h"
 
+#include <MLV/MLV_all.h>
 #include <stdio.h>
 
+#include "../include/init.h"
 #include "../include/struct.h"
+#include "../include/tool.h"
 
 int is_in_board(int width, int height, int x, int y) {
     return ((x >= 0 && x < width) &&
@@ -44,7 +47,6 @@ int break_cell(Game* g, int x, int y) {
     }
     if (g->terrain[y][x] == UNDISCOVERED) {
         int val = nb_mines(g, x, y);
-        fprintf(stderr, "voisin %d", val);
         g->terrain[y][x] = (!val) ? EMPTY : val;
     }
     return 0;
@@ -55,15 +57,15 @@ void flag_cell(Game* g, int x, int y) {
         return;
     }
 
-    Cell c = g->terrain[y][x];
-    if (c == MINE) {
-        c = FLAG_MINE;
-    } else if (c == FLAG_MINE) {
-        c = MINE;
-    } else if (c == FLAG) {
-        c = UNDISCOVERED;
-    } else if (c == UNDISCOVERED) {
-        c = FLAG;
+    Cell* c = &g->terrain[y][x];
+    if (*c == MINE) {
+        *c = FLAG_MINE;
+    } else if (*c == FLAG_MINE) {
+        *c = MINE;
+    } else if (*c == FLAG) {
+        *c = UNDISCOVERED;
+    } else if (*c == UNDISCOVERED) {
+        *c = FLAG;
     }
 }
 
@@ -98,5 +100,20 @@ int defeat(Game* g) {
     return 0;
 }
 
-void extend_undiscovered(Game* g, int x, int y) {
+void extend_undiscovered(Game* g, int x, int y, void (*func_graph)(int, int, int, int)) {
+    break_cell(g, x, y);
+    func_graph(x, y, g->cell_size, g->terrain[y][x]);
+
+    if (g->terrain[y][x] != EMPTY) {
+        return;
+    }
+
+    int coords[8][2] = NEIGHBOR(x, y);
+    for (int i = 0; i < 8; i++) {
+        int n_x = coords[i][0], n_y = coords[i][1];
+        if (is_in_board(g->width, g->height, n_x, n_y) &&
+            g->terrain[n_y][n_x] == UNDISCOVERED) {
+            extend_undiscovered(g, n_x, n_y, func_graph);
+        }
+    }
 }

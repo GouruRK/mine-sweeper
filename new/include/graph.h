@@ -14,7 +14,8 @@
 #include "struct.h"
 
 void exit_function(void* data);
-void draw_undiscorvered(int x, int y, int cell_size);
+void init_window_mlv(int* stop, Game g);
+void draw_undiscovered(int x, int y, int cell_size);
 void draw_flag(int x, int y, int cell_size);
 void draw_discovered(int x, int y, int cell_size, int val);
 void draw_game(Game g);

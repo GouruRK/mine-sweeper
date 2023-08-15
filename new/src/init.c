@@ -91,7 +91,7 @@ int create_game_param(Game* g, int user_x, int user_y) {
         for (int i = 0; i < g->mines; i++) {
             int x = random_coord(g->width - 1);
             int y = random_coord(g->height - 1);
-            while (g->terrain[y][x] == MINE && x != user_x && y != user_y) {
+            while (g->terrain[y][x] == MINE || (x == user_x && y == user_y)) {
                 x = random_coord(g->width - 1);
                 y = random_coord(g->height - 1);
             }

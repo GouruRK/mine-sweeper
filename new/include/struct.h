@@ -12,6 +12,7 @@
 #define __INIT_STRUCT__
 
 #define GRAPHIC_SAFETY_MARGIN 200
+#define TIME_INTERVAL 100
 
 #define NEIGHBOR(x, y)          \
     {                           \
