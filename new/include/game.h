@@ -20,4 +20,5 @@ void flag_cell(Game* g, int x, int y);
 int victory(Game* g);
 int defeat(Game* g);
 void extend_undiscovered(Game* g, int x, int y, void (*func_graph)(int, int, int, int));
+int mine_left(Game* g);
 #endif

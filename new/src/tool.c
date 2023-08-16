@@ -53,5 +53,5 @@ void resize_game(Game* g) {
 
 void coord_to_cell(int* x, int* y, int cell_size) {
     *x = *x / cell_size;
-    *y = *y / cell_size;
+    *y = (*y - GRAPHIC_HEADER) / cell_size;
 }

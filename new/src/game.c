@@ -19,7 +19,7 @@
 
 int is_in_board(int width, int height, int x, int y) {
     return ((x >= 0 && x < width) &&
-            (y >= 0 && y < width));
+            (y >= 0 && y < height));
 }
 
 int nb_mines(Game* g, int x, int y) {
@@ -116,4 +116,16 @@ void extend_undiscovered(Game* g, int x, int y, void (*func_graph)(int, int, int
             extend_undiscovered(g, n_x, n_y, func_graph);
         }
     }
+}
+
+int mine_left(Game* g) {
+    int acc_flag = 0;
+    for (int y = 0; y < g->height; y++) {
+        for (int x = 0; x < g->width; x++) {
+            if (g->terrain[y][x] == FLAG || g->terrain[y][x] == FLAG_MINE) {
+                acc_flag++;
+            }
+        }
+    }
+    return g->mines - acc_flag;
 }

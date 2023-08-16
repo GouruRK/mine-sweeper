@@ -39,7 +39,6 @@ int main(int argc, char *argv[]) {
     resize_game(&g);
 
     init_window_mlv(&stop, g);
-
     if (!valid_file) {
         do {
             ev = MLV_wait_event_or_milliseconds(&touche, NULL, NULL, NULL, NULL, &x, &y, &mouse, &state, TIME_INTERVAL);
@@ -54,6 +53,7 @@ int main(int argc, char *argv[]) {
                     } else {
                         draw_undiscovered(x, y, g.cell_size);
                     }
+                    draw_header(mine_left(&g));
                 }
             }
         } while (!stop);
@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
                 } else if (g.terrain[y][x] == UNDISCOVERED) {
                     draw_undiscovered(x, y, g.cell_size);
                 }
+                draw_header(mine_left(&g));
             }
         }
     }
