@@ -111,3 +111,28 @@ int read_file(Game* g) {
     fclose(f);
     return 1;
 }
+
+void save(Game* g) {
+    if (!g->terrain) {
+        return;
+    }
+    FILE* f = fopen("../grids/save.ga", "w");
+    if (!f) {
+        return;
+    }
+    fprintf(f, "%d %d %d\n", g->height, g->width, g->mines);
+
+    for (int y = 0; y < g->height; y++) {
+        for (int x = 0; x < g->width; x++) {
+            fprintf(f, "%d", g->terrain[y][x]);
+            if (x != g->width - 1) {
+                fprintf(f, " ");
+            }
+        }
+        if (y != g->height - 1) {
+            fprintf(f, "\n");
+        }
+    }
+    fclose(f);
+    return;
+}

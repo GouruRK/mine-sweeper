@@ -43,17 +43,23 @@ int main(int argc, char *argv[]) {
         do {
             ev = MLV_wait_event_or_milliseconds(&touche, NULL, NULL, NULL, NULL, &x, &y, &mouse, &state, TIME_INTERVAL);
             if (ev == MLV_MOUSE_BUTTON && state == MLV_PRESSED) {
-                coord_to_cell(&x, &y, g.cell_size);
-                if (mouse == MLV_BUTTON_LEFT) {
-                    break;
-                } else if (mouse == MLV_BUTTON_RIGHT) {
-                    g.terrain[y][x] = (g.terrain[y][x] == FLAG) ? (UNDISCOVERED) : (FLAG);
-                    if (g.terrain[y][x] == FLAG) {
-                        draw_flag(x, y, g.cell_size);
-                    } else {
-                        draw_undiscovered(x, y, g.cell_size);
+                if (y > 50) {
+                    coord_to_cell(&x, &y, g.cell_size);
+                    if (mouse == MLV_BUTTON_LEFT) {
+                        break;
+                    } else if (mouse == MLV_BUTTON_RIGHT) {
+                        g.terrain[y][x] = (g.terrain[y][x] == FLAG) ? (UNDISCOVERED) : (FLAG);
+                        if (g.terrain[y][x] == FLAG) {
+                            draw_flag(x, y, g.cell_size);
+                        } else {
+                            draw_undiscovered(x, y, g.cell_size);
+                        }
+                        draw_header(mine_left(&g));
                     }
-                    draw_header(mine_left(&g));
+                } else if (y < 63 && y > 12 &&
+                           x < MLV_get_window_width() - 12 &&
+                           x > MLV_get_window_width() - 62) {
+                    save(&g);
                 }
             }
         } while (!stop);
@@ -69,21 +75,27 @@ int main(int argc, char *argv[]) {
 
     while (!stop) {
         ev = MLV_wait_event_or_milliseconds(&touche, NULL, NULL, NULL, NULL, &x, &y, &mouse, &state, 100);
-        if (ev == MLV_MOUSE_BUTTON && state == MLV_PRESSED) {
-            coord_to_cell(&x, &y, g.cell_size);
-            if (mouse == MLV_BUTTON_LEFT) {
-                extend_undiscovered(&g, x, y, draw_discovered);
+        if (y > 50) {
+            if (ev == MLV_MOUSE_BUTTON && state == MLV_PRESSED) {
+                coord_to_cell(&x, &y, g.cell_size);
+                if (mouse == MLV_BUTTON_LEFT) {
+                    extend_undiscovered(&g, x, y, draw_discovered);
 
-            } else if (mouse == MLV_BUTTON_RIGHT) {
-                flag_cell(&g, x, y);
+                } else if (mouse == MLV_BUTTON_RIGHT) {
+                    flag_cell(&g, x, y);
 
-                if (g.terrain[y][x] == FLAG || g.terrain[y][x] == FLAG_MINE) {
-                    draw_flag(x, y, g.cell_size);
-                } else if (g.terrain[y][x] == UNDISCOVERED) {
-                    draw_undiscovered(x, y, g.cell_size);
+                    if (g.terrain[y][x] == FLAG || g.terrain[y][x] == FLAG_MINE) {
+                        draw_flag(x, y, g.cell_size);
+                    } else if (g.terrain[y][x] == UNDISCOVERED) {
+                        draw_undiscovered(x, y, g.cell_size);
+                    }
+                    draw_header(mine_left(&g));
                 }
-                draw_header(mine_left(&g));
             }
+        } else if (y < 63 && y > 12 &&
+                   x < MLV_get_window_width() - 12 &&
+                   x > MLV_get_window_width() - 62) {
+            save(&g);
         }
     }
     MLV_free_window();

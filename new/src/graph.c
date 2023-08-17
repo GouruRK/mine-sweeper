@@ -181,6 +181,8 @@ void draw_game(Game g) {
             } else if (c == FLAG || c == FLAG_MINE) {
                 draw_undiscovered(x, y, g.cell_size);
                 draw_flag(x, y, g.cell_size);
+            } else if ((c >= ONE && c <= EIGHT) || c == EMPTY) {
+                draw_discovered(x, y, g.cell_size, c);
             }
         }
     }
