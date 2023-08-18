@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
         do {
             ev = MLV_wait_event_or_milliseconds(&touche, NULL, NULL, NULL, NULL, &x, &y, &mouse, &state, TIME_INTERVAL);
             if (ev == MLV_MOUSE_BUTTON && state == MLV_PRESSED) {
-                if (y > 50) {
+                if (y > GRAPHIC_HEADER) {
                     coord_to_cell(&x, &y, g.cell_size);
                     if (mouse == MLV_BUTTON_LEFT) {
                         break;
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 
     while (!stop) {
         ev = MLV_wait_event_or_milliseconds(&touche, NULL, NULL, NULL, NULL, &x, &y, &mouse, &state, 100);
-        if (y > 50) {
+        if (y > GRAPHIC_HEADER) {
             if (ev == MLV_MOUSE_BUTTON && state == MLV_PRESSED) {
                 coord_to_cell(&x, &y, g.cell_size);
                 if (mouse == MLV_BUTTON_LEFT) {
@@ -97,7 +97,14 @@ int main(int argc, char *argv[]) {
                    x > MLV_get_window_width() - 62) {
             save(&g);
         }
+
+        if (defeat(&g)) {
+            draw_end_game(g);
+            break;
+        }
     }
+    MLV_wait_seconds(2);
+    free_board(g.terrain, g.height);
     MLV_free_window();
     return EXIT_SUCCESS;
 }

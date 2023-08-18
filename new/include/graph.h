@@ -21,6 +21,9 @@ void draw_discovered(int x, int y, int cell_size, int val);
 void draw_nbmine(int nbmine);
 void draw_save(void);
 void draw_header(int nbmine);
+void draw_mine(int x, int y, int cell_size, int explosed);
+void draw_end_game(Game g);
+
 void draw_game(Game g);
 
 #endif

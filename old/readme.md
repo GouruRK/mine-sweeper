@@ -1,16 +1,15 @@
 # Démineur - Laborde Quentin, Kies Rémy 
 
-![LOGO](./extern_file/Logo_Université_Gustave_Eiffel_2020.svg.png)
+![LOGO](../extern_file/Logo_Université_Gustave_Eiffel_2020.svg.png)
 
 ___
 
-![SCREENSHOT](./extern_file/game_new.png)
+![SCREENSHOT](../extern_file/game.png)
 
 Sommaire :
 - [Démineur - Laborde Quentin, Kies Rémy](#démineur---laborde-quentin-kies-rémy)
   - [Manuel utilisateur](#manuel-utilisateur)
     - [Compilation](#compilation)
-    - [Nettoyage](#nettoyage)
     - [Arguments optionnels](#arguments-optionnels)
     - [Jeu](#jeu)
   - [Fonctionnalités](#fonctionnalités)
@@ -21,15 +20,10 @@ Sommaire :
 
 ### Compilation
 
-> ```bash
-> cd new
-> make
-> ```
 
-### Nettoyage
->```bash
-> cd new
-> make mrproper
+> ```bash
+> cd old
+> clang -std=c17 -Wall -Wfatal-errors minesweeper.c -o mine -lMLV
 > ```
 
 ### Arguments optionnels

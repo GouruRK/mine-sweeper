@@ -56,7 +56,18 @@ Game parser(int argc, char** argv) {
                 break;
 
             case 'h':
-                printf("One day maybe...\n");
+                printf(
+                    "\nMinesweeper helper :\n\n"
+                    "./build/minesweeper [map] [-r seed] [-c \"height width mines\"]\n\n"
+                    "map :\n"
+                    "\t path to the file where the map is written\n\n"
+                    "-r / --random :\n"
+                    "\t seed for the random genrator (int)\n\n"
+                    "-c / --custom :\n"
+                    "\t Generate a random map using the given paramaters\n"
+                    "\t\t height of the map (int)\n"
+                    "\t\t width of the map (int)\n"
+                    "\t\t number of mines (int)\n\n");
                 break;
 
             default:

@@ -12,7 +12,7 @@
 #define __INIT_STRUCT__
 
 #define GRAPHIC_HEADER 75
-#define GRAPHIC_SAFETY_MARGIN 200
+#define GRAPHIC_SAFETY_MARGIN 225
 #define TIME_INTERVAL 100
 
 #define NEIGHBOR(x, y)          \

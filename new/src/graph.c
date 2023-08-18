@@ -101,7 +101,7 @@ void draw_discovered(int x, int y, int cell_size, int val) {
     MLV_draw_rectangle(s_x, s_y,
                        cell_size, cell_size,
                        MLV_COLOR_DARK_GREY);
-    if (val != EMPTY) {
+    if (val >= ONE && val <= EIGHT) {
         MLV_get_size_of_text("%d", &text_w, &text_h, val);
         MLV_draw_text(s_x + cell_size / 2 - text_w / 2,
                       s_y + cell_size / 2 - text_h / 2,
@@ -169,6 +169,31 @@ void draw_header(int nbmine) {
                               MLV_COLOR_DARK_GREY);
     draw_nbmine(nbmine);
     draw_save();
+}
+
+void draw_mine(int x, int y, int cell_size, int explosed) {
+    MLV_Color col = (explosed) ? (MLV_COLOR_RED) : (MLV_COLOR_BLACK);
+    int s_x = x * cell_size, s_y = y * cell_size + GRAPHIC_HEADER;
+    int text_w, text_h;
+
+    MLV_get_size_of_text("*", &text_w, &text_h);
+    MLV_draw_text(s_x + cell_size / 2 - text_w / 2,
+                  s_y + cell_size / 2 - text_h / 2,
+                  "*", col);
+    MLV_update_window();
+}
+
+void draw_end_game(Game g) {
+    for (int y = 0; y < g.height; y++) {
+        for (int x = 0; x < g.width; x++) {
+            Cell c = g.terrain[y][x];
+            if (c == MINE || c == FLAG_MINE) {
+                draw_mine(x, y, g.cell_size, 0);
+            } else if (c == EXPLOSION) {
+                draw_mine(x, y, g.cell_size, 1);
+            }
+        }
+    }
 }
 
 void draw_game(Game g) {
