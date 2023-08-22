@@ -16,10 +16,10 @@ HEADERS=$(wildcard $(INC_DIR)/*.h)
 OBJS=$(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SOURCES))
 #$(info $(OBJS))
 
-all: $(BUILD_DIR)/$(EXEC)
+all: $(EXEC)
 
 # Assemblage de l'exécutable final
-$(BUILD_DIR)/$(EXEC): $(OBJS)
+$(EXEC): $(OBJS)
 	$(CC) $^ -o $@ $(LIBS)
 
 # Dépendances
@@ -39,7 +39,7 @@ clean:
 	rm -f $(OBJS)
 
 mrproper: clean
-	rm -f $(BUILD_DIR)/$(EXEC)
+	rm -f $(EXEC)
 
 # CC=gcc
 # CFLAGS=-Wall -std=c17 -pedantic

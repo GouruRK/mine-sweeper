@@ -34,6 +34,11 @@ Game parser(int argc, char** argv) {
                 int h, w, m, ok;
                 ok = sscanf(optarg, "%d %d %d", &h, &w, &m);
                 if (ok == 3) {
+                    if (h * w <= m) {
+                        fprintf(stderr, "/!\\ Too much mines for this size /!\\ \n");
+                        fprintf(stderr, "Modification will not be considered.\n");
+                        break;
+                    }
                     g.height = h;
                     g.width = w;
                     g.mines = m;
