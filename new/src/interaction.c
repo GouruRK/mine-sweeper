@@ -10,12 +10,15 @@
 
 #include "../include/interaction.h"
 
+#include <MLV/MLV_all.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../include/game.h"
+#include "../include/graph.h"
 #include "../include/init.h"
-#include "../include/struct.h"
+#include "../include/tool.h"
 
 Game parser(int argc, char** argv) {
     int option_index = 0, opt;
@@ -151,4 +154,78 @@ void save(Game* g) {
     }
     fclose(f);
     return;
+}
+
+int play(Game* g, int valid_file, int* stop) {
+    MLV_Event ev = MLV_NONE;
+    MLV_Keyboard_button touche;
+    MLV_Mouse_button mouse;
+    MLV_Button_state state;
+    int x, y;
+
+    if (!valid_file) {
+        do {
+            ev = MLV_wait_event_or_milliseconds(&touche, NULL, NULL, NULL, NULL, &x, &y, &mouse, &state, TIME_INTERVAL);
+            if (ev == MLV_MOUSE_BUTTON && state == MLV_PRESSED) {
+                if (y > GRAPHIC_HEADER) {
+                    coord_to_cell(&x, &y, g->cell_size);
+                    if (mouse == MLV_BUTTON_LEFT) {
+                        break;
+                    } else if (mouse == MLV_BUTTON_RIGHT) {
+                        g->terrain[y][x] = (g->terrain[y][x] == FLAG) ? (UNDISCOVERED) : (FLAG);
+                        if (g->terrain[y][x] == FLAG) {
+                            draw_flag(x, y, g->cell_size);
+                        } else {
+                            draw_undiscovered(x, y, g->cell_size);
+                        }
+                        draw_header(mine_left(g));
+                    }
+                } else if (y < 63 && y > 12 &&
+                           x < MLV_get_window_width() - 12 &&
+                           x > MLV_get_window_width() - 62) {
+                    save(g);
+                }
+            }
+        } while (!(*stop));
+        free_board(g->terrain, g->height);
+        if (!create_game_param(g, x, y)) {
+            fprintf(stderr, "Terrain not loaded\n End of execution\n");
+            return EXIT_FAILURE;
+        }
+    }
+
+    draw_game(*g);
+    extend_undiscovered(g, x, y, draw_discovered);
+
+    while (!(*stop)) {
+        ev = MLV_wait_event_or_milliseconds(&touche, NULL, NULL, NULL, NULL, &x, &y, &mouse, &state, 100);
+        if (y > GRAPHIC_HEADER) {
+            if (ev == MLV_MOUSE_BUTTON && state == MLV_PRESSED) {
+                coord_to_cell(&x, &y, g->cell_size);
+                if (mouse == MLV_BUTTON_LEFT && !(g->terrain[y][x] == FLAG) && !(g->terrain[y][x] == FLAG_MINE)) {
+                    extend_undiscovered(g, x, y, draw_discovered);
+
+                } else if (mouse == MLV_BUTTON_RIGHT) {
+                    flag_cell(g, x, y);
+
+                    if (g->terrain[y][x] == FLAG || g->terrain[y][x] == FLAG_MINE) {
+                        draw_flag(x, y, g->cell_size);
+                    } else if (g->terrain[y][x] == UNDISCOVERED || g->terrain[y][x] == MINE) {
+                        draw_undiscovered(x, y, g->cell_size);
+                    }
+                    draw_header(mine_left(g));
+                }
+            }
+        } else if (y < 63 && y > 12 &&
+                   x < MLV_get_window_width() - 12 &&
+                   x > MLV_get_window_width() - 62) {
+            save(g);
+        }
+
+        if (defeat(g) || victory(g)) {
+            draw_end_game(*g);
+            break;
+        }
+    }
+    return EXIT_SUCCESS;
 }

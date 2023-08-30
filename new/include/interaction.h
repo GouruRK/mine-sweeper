@@ -16,5 +16,6 @@
 Game parser(int argc, char** argv);
 int read_file(Game* g);
 void save(Game* g);
+int play(Game* g, int valid_file, int* stop);
 
 #endif
