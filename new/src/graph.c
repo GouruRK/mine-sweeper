@@ -198,6 +198,9 @@ void draw_end_game(Game g) {
 
 void draw_game(Game g) {
     Cell c;
+
+    draw_header(g.mines);
+
     for (int y = 0; y < g.height; y++) {
         for (int x = 0; x < g.width; x++) {
             c = g.terrain[y][x];
@@ -211,5 +214,4 @@ void draw_game(Game g) {
             }
         }
     }
-    draw_header(g.mines);
 }
