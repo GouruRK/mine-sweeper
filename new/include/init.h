@@ -16,7 +16,7 @@
 /**
  * @brief Initialises game with default values.
  *
- * @return Game initialised
+ * @return Initialised game
  */
 Game init_game(void);
 
@@ -39,18 +39,18 @@ Cell** init_board_empty(int width, int height);
 Cell** init_board_full(int width, int height);
 
 /**
- * @brief Create a game with parameters.
+ * @brief Creates a game with parameters.
  *
  * @param g Actual game status
  * @param user_x user x input
- * @param user_y  user y input
- * @return O error
- *         else 1
+ * @param user_y user y input
+ * @return '0' error
+ *         else '1'
  */
 int create_game_param(Game* g, int user_x, int user_y);
 
 /**
- * @brief Free the board.
+ * @brief Free the memory allocated for the board.
  *
  * @param tab board to free
  * @param line mumber of line you want to free.

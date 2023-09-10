@@ -14,16 +14,16 @@
 #include "struct.h"
 
 /**
- * @brief Parse the argument given to the project.
+ * @brief Parses the given arguments to the programm.
  *
- * @param argc number of argument
- * @param argv array of argument
+ * @param argc number of arguments
+ * @param argv array of arguments
  * @return Initialised game
  */
 Game parser(int argc, char** argv);
 
 /**
- * @brief Read the file in order to load a game.
+ * @brief Read a file in order to load a game.
  *
  * @param g Game where information will be write
  * @return 0 error / 1 ok
@@ -31,19 +31,19 @@ Game parser(int argc, char** argv);
 int read_file(Game* g);
 
 /**
- * @brief Save actual game status.
+ * @brief Save current game status.
  *
- * @param g Actual game status
+ * @param g Current game status
  */
 void save(Game* g);
 
 /**
- * @brief Overall function where who handle user interactions.
+ * @brief Overall function to handle user's interactions.
  *
- * @param g Game who will be modificated
+ * @param g Game to be modificated
  * @param valid_file if the function have to load a file
- * @param stop varaible used to exit windows libMLV
- * @return 0 ok / 1 error
+ * @param stop variable used to exit libMLV's window
+ * @return '0' ok / '1' error
  */
 int play(Game* g, int valid_file, int* stop);
 
