@@ -51,21 +51,21 @@ Sommaire :
 > ```
 > If the file doesn't exist a random map will be generated.
 
-You can use multiple argument at the same time.\
+You can use multiple arguments at the same time.\
 The game can be lunch without argument, the program will lunch a 10x10 grid with 10 mines.
 
 ### Game
 
-Rules are the same as a classic minesweeper.\
+Rules are the same as a classic minesweeper.
 
-When the program is lunch, the user can :
-* Use `left click` reveal a tile.
-* Use `right click` place or remove a flag. 
+When the program is launch, the user can :
+* Use `left click` to reveal a tile.
+* Use `right click` to place or remove a flag. 
 
 
 ## Feature :
 
 * Save
-  * The user can save at any moment the game, the save will go in the folder `grid` than in the file `save.ga`.
+  * The user can save at any moment the game, the save will go in the folder `grid` in the file `save.ga`.
 ___
 Laborde Quentin, Kies Rémy 
